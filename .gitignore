@@ -1,0 +1,24 @@
+# Nothing executable lives here, but belt and braces.
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+vault.yml
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Scratch
+scratch/
+*.local.md

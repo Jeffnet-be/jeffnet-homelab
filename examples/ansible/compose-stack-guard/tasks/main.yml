@@ -1,0 +1,131 @@
+---
+# Delivery guard for .env-driven compose stacks.
+#
+# Compares the keys a stack's .env template DECLARES against the keys the primary
+# container actually RECEIVED, and fails when anything was declared and not delivered.
+#
+# Required per stack (deliberately not defaulted):
+#   stack_name               - the compose project / directory name
+#   stack_primary_container  - the container whose environment is authoritative
+#
+# Optional:
+#   stack_env_not_injected   - keys that are substitution-only by design; empty means
+#                              "no exceptions", which is a meaningful default.
+
+- name: Require an explicit primary container for this stack
+  # Runs BEFORE the stack is brought up: this checks a declaration, not state,
+  # so it must fail before any work is done.
+  ansible.builtin.assert:
+    that:
+      - stack_primary_container is defined
+      - stack_primary_container | length > 0
+    fail_msg: >-
+      stack_primary_container is not set for stack '{{ stack_name }}'. Set it explicitly,
+      even when it equals the stack name. A default here would guess a container and then
+      report whatever it happened to find.
+
+- name: Locate the .env template for this stack
+  ansible.builtin.stat:
+    path: "{{ role_path }}/templates/{{ stack_name }}.env.j2"
+  delegate_to: localhost
+  become: false          # delegate_to: localhost otherwise inherits become
+  run_once: true
+  register: _env_tpl
+
+- name: Well-formedness of the rendered .env
+  when: _env_tpl.stat.exists
+  block:
+
+    - name: Read lines that are neither comments, blanks, nor KEY=value
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          grep -vE '^[[:space:]]*(#|$)' {{ compose_stack_base }}/.env
+          | grep -vE '^[A-Za-z_][A-Za-z0-9_]*='
+        executable: /bin/bash
+      register: _env_malformed
+      changed_when: false
+      check_mode: false            # shell/command are skipped under --check
+      failed_when: _env_malformed.rc not in [0, 1]
+      # rc contract: grep -v exits 1 when it finds nothing, which is the healthy case.
+
+    - name: Fail on a malformed .env
+      ansible.builtin.assert:
+        that:
+          - _env_malformed.stdout_lines | length == 0
+        fail_msg: >-
+          Malformed lines in {{ compose_stack_base }}/.env:
+          {{ _env_malformed.stdout_lines | join(', ') }}
+
+- name: Declared-versus-delivered
+  when: _env_tpl.stat.exists
+  block:
+
+    - name: Keys declared by the .env template
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          grep -E '^[A-Za-z_][A-Za-z0-9_]*=' {{ compose_stack_base }}/.env
+          | cut -d= -f1
+        executable: /bin/bash
+      register: _declared
+      changed_when: false
+      check_mode: false
+      failed_when: >-
+        _declared.rc not in [0, 1]
+        or _declared.stdout_lines | length == 0
+      # rc contract: 0 or 1, AND non-empty. A template declaring nothing is a defect,
+      # not an empty set to compare against.
+
+    - name: Keys the compose file consumes by ${substitution}
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          grep -oE '\$\{[A-Za-z_][A-Za-z0-9_]*' {{ compose_stack_base }}/compose.yml
+          | tr -d '${'
+        executable: /bin/bash
+      register: _substituted
+      changed_when: false
+      check_mode: false
+      failed_when: _substituted.rc not in [0, 1]
+      # rc contract: 0 or 1, and EMPTY IS VALID. Zero ${} is normal for an env_file stack.
+
+    - name: Keys the primary container actually received
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          docker inspect {{ stack_primary_container }}
+          --format '{% raw %}{{range .Config.Env}}{{println .}}{{end}}{% endraw %}'
+          | cut -d= -f1
+        executable: /bin/bash
+      register: _received
+      changed_when: false
+      check_mode: false
+      failed_when: >-
+        _received.rc != 0
+        or _received.stdout_lines | length == 0
+      # rc contract: 0 AND non-empty. Every container has environment; an empty answer
+      # here means the read failed, and "could not read" must never be reported as
+      # "received none".
+
+    - name: Compute the undelivered set once
+      # One expression, one fact. The assert and its message must not be two
+      # expressions that have to agree.
+      ansible.builtin.set_fact:
+        _undelivered: >-
+          {{ _declared.stdout_lines
+             | difference(_received.stdout_lines)
+             | difference(_substituted.stdout_lines)
+             | difference(stack_env_not_injected | default([]))
+             | sort }}
+
+    - name: Fail when anything was declared and never delivered
+      # No | default([]) anywhere in this comparison: with honest reads, a default
+      # could only hide something.
+      ansible.builtin.assert:
+        that:
+          - _undelivered | length == 0
+        fail_msg: >-
+          Declared in .env but never delivered to '{{ stack_primary_container }}':
+          {{ _undelivered | join(', ') }}.
+          Check that the service carries env_file: .env — .env substitutes, env_file injects.
