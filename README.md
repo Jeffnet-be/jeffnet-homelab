@@ -1,47 +1,20 @@
 # jeffnet-homelab
 
-A three-node Proxmox estate, built with Terraform and Ansible, then **reviewed** — service by
-service, against nine questions. This repository is the write-up: the architecture, the operating
-patterns, the reusable code shapes, and the findings.
+Documentation of my home network and homelab — the architecture, the patterns I reuse, and what
+reviewing all of it turned up.
 
-The findings are the point. The build took a few weeks; the review pass has produced more than the
-build did, and almost all of it in what services leave behind rather than in the services
-themselves.
+It covers the whole environment rather than one rack: a segmented network behind a firewall doing
+all inter-VLAN policy, a three-node Proxmox cluster built with Terraform and Ansible, the
+self-hosted services on top of it, home automation and cameras, and the smaller builds that don't
+belong to any of those.
+
+The findings are the point. The build took weeks; going back through it service by service has
+produced more than the build did, and almost all of it in what things leave behind rather than in
+the things themselves.
 
 > **Scope note.** This is documentation, not the estate. The infrastructure code lives in a private
-> repository; nothing here is generated from it, and nothing here is applied to anything. Internal
+> repository; nothing here is generated from it and nothing here is applied to anything. Internal
 > names, addresses and identifiers are substituted throughout — see [SETUP.md](SETUP.md).
-
----
-
-## The estate in one page
-
-**Platform** — three Proxmox VE nodes in a cluster, all guests declared in Terraform across two
-states (VMs, services). Node-local VM templates. Guests are LXC except where the workload forbids
-it — the SIEM needs `vm.max_map_count`, which is not namespaced, so it is a VM.
-
-**Configuration** — Ansible, roles cloned from git on a dedicated controller. Two plays run
-estate-wide on a schedule: a baseline (`common`) and endpoint-agent enrolment. Everything else is
-per-host and derived from a single declaration.
-
-**Ingress** — one Caddy instance, one site block, one wildcard certificate issued over DNS-01,
-one split-horizon wildcard DNS record. Services are declared once in host vars and *derived* into
-proxy routes, dashboard cards, uptime checks and metric targets. Adding a service is one entry,
-never a block. Deleting one removes all five consumers by itself.
-
-**Observability** — Prometheus with three probe layers, a metrics stack, network monitoring by
-SNMP, config backup by SSH, log aggregation, and a SIEM with agents on every guest. Detectors
-publish to a single self-hosted push service with one write-only identity each, and one phone
-subscription. Many detectors, one pager.
-
-**Credentials** — three roles, three scopes, no overlap. The workstation authors and can write to
-both remotes. The controller executes: read-only clone, holds the vault, pushes nothing. The
-scheduler executes on a timer: read-only deploy key scoped to one repository, vault delivered out
-of band, SSH reaching one inventory group and pinned by source address.
-
-**Network** — six VLANs behind a firewall doing all inter-VLAN policy, with seven rules total into
-and out of the server VLAN. A mesh VPN provides remote access and a subnet route, which is
-deliberately a hole in the segmentation and is written down as one.
 
 ---
 
@@ -49,11 +22,41 @@ deliberately a hole in the segmentation and is written down as one.
 
 | If you want | Read |
 |---|---|
-| The design and why it landed there | [docs/architecture/network.md](docs/architecture/network.md) |
-| How a service gets deployed, and reviewed | [docs/operations/reviewing-a-service.md](docs/operations/reviewing-a-service.md) |
-| The interesting part | [docs/findings/](docs/findings/) |
-| The rules that came out of it | [docs/principles/README.md](docs/principles/README.md) |
+| Segmentation, firewall policy, DNS and ingress | [docs/network/](docs/network/README.md) |
+| The home side — IoT, cameras, automation | [docs/home/](docs/home/README.md) |
+| How a service gets deployed, and reviewed | [docs/operations/](docs/operations/reviewing-a-service.md) |
+| **The interesting part** | [docs/findings/](docs/findings/) |
+| The rules that came out of it | [docs/principles/](docs/principles/README.md) |
 | Code you can lift | [examples/](examples/) |
+
+---
+
+## The environment in one page
+
+**Network** — six VLANs behind a firewall that is both gateway and policy point, with a managed
+switch carrying tagged trunks. Seven rules govern the server VLAN in total. IoT and cameras are
+isolated, and the exceptions are enumerated rather than assumed. A mesh VPN provides remote access
+and a subnet route, which is deliberately a hole in the segmentation and is written down as one.
+
+**Platform** — three Proxmox nodes in a cluster, every guest declared in Terraform, configuration by
+Ansible from a dedicated controller. Two plays run estate-wide on a schedule. Guests are containers
+except where the workload forbids it.
+
+**Ingress** — one reverse proxy, one site block, one wildcard certificate over DNS-01, one
+split-horizon wildcard DNS record. A service is declared once and *derived* into its proxy route,
+dashboard card, uptime check and metric targets. Adding one is an entry, never a block; deleting one
+removes all four by itself.
+
+**Observability** — probes at three layers, network monitoring by SNMP, config backup by SSH, log
+aggregation, and host-based intrusion detection on every guest. Detectors publish to a single push
+service with one write-only identity each, and one phone subscription.
+
+**Credentials** — three roles, three scopes, no overlap. The workstation authors. The controller
+executes with a read-only clone and holds the vault. The scheduler executes on a timer with a
+read-only deploy key, the vault delivered out of band, and SSH pinned by source address.
+
+**Home** — automation and cameras on isolated VLANs, documented as a design rather than as a floor
+plan. See [the scoping note](docs/home/README.md) for what is deliberately absent.
 
 ---
 
@@ -64,12 +67,14 @@ Most of what fails in a small estate does not look broken.
 A backup storage that had never carried a byte was *fully declared*. A mail notification path was
 *trying the whole time*, bouncing to an address nobody read. A monitoring stack fired seven real
 alerts into a channel nobody was subscribed to on a device that interrupts. A delivery task copied
-nothing, twice, from two different wrong paths, and reported success both times. A guard compared
-a list against an empty list produced by a pipeline whose last command could not fail.
+nothing, twice, from two different wrong paths, and reported success both times. A guard compared a
+list against an empty one produced by a pipeline whose last command could not fail. An enrolment
+port was closed on purpose, correctly, and nothing recorded that the estate had stopped being able
+to grow.
 
 Exactly one of those looks like an outage. The rest look like green.
 
-The habits in [docs/principles](docs/principles/README.md) all exist because one of them happened
+Everything in [docs/principles](docs/principles/README.md) is there because one of them happened
 here, on real hardware, and was found by reading the machine instead of the documentation.
 
 ---

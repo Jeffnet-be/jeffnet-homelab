@@ -1,0 +1,35 @@
+name: gitleaks
+
+# The pre-commit hook lives in .git/hooks/ and is therefore not version-controlled:
+# it exists on one laptop and does not survive a fresh clone. This is the same
+# control at a boundary that does. The hook is fast feedback; this is the control.
+#
+# Coverage difference worth knowing: the hook runs with --staged and scans the
+# index, so it reads zero commits and cannot see history. This scans the full
+# history on every push.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Rules get added upstream. A repository that passed in March is not a
+    # repository that passes today.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # full history; the default shallow clone scans one commit
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITLEAKS_LICENSE is only required for organisation-owned repos.
