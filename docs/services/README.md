@@ -36,7 +36,7 @@ a commercial password manager that already has a mobile client and a recovery st
 
 ## The contract
 
-![One declaration, four consumers](../../diagrams/service-derivation.svg)
+![One contract, two sources, five consumers](../../diagrams/service-derivation.svg)
 
 A service is declared **once**, in the host's variables: an identifier, the DNS name it answers to,
 a port, and an authentication mode. A `contract` role derives everything else — FQDN, upstream,
