@@ -4,10 +4,22 @@ The network does not stop at the server VLAN. Cameras, the automation platform, 
 client devices are part of the same design, and most of the segmentation decisions elsewhere in
 these docs exist because of them.
 
-## What is documented here
+> **Status, 11 Sep 2026.** This page is a scope, not yet a write-up. An export of the live firewall
+> policy did not match my own notes about what these VLANs are permitted to do — and it diverged in
+> *both* directions: some boundaries turned out tighter in practice than the rules require, others
+> looser than the notes claimed. Nothing here asserts a boundary until it has been read off the
+> machine rather than off a document. That reconciliation is the next piece of work, and it is the
+> reason this section is short.
 
-- **Why IoT and cameras are isolated**, and what "isolated" is actually enforcing - which direction
-  is blocked, what the exceptions are, and how each one was verified rather than assumed.
+## What will be documented here
+
+- **What separating IoT and cameras is actually enforcing** — which direction is blocked, what the
+  exceptions are, and how each one was verified rather than assumed. Separate VLAN and *isolated*
+  are two different claims, and only the first one is free.
+- **The gap between what a rule permits and what the devices do.** These are different measurements
+  taken from different places, and each can be the flattering one. A rule that permits something
+  nothing uses is a latent capability; a device doing something no rule mentions is a gap in the
+  notes. Both are worth writing down, and neither can be read off the other.
 - **The automation platform's failure domain.** It runs on the same cluster as everything else,
   which is a decision with consequences worth stating.
 - **How the home side is backed up**, and whether that has ever been restored from.
