@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 620" width="1120" height="620" font-family="Inter, 'Segoe UI', system-ui, sans-serif">
+  <defs>
+    <marker id="d-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-end">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b6ea5"/>
+    </marker>
+    <marker id="d-arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-end">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#a03d3d"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1120" height="620" fill="#f7f8fa"/>
+
+  <text x="40" y="52" font-size="25" font-weight="600" fill="#1b2430">One declaration, four consumers</text>
+  <text x="40" y="78" font-size="14.5" fill="#5a6675">A service is declared once in host vars. Everything that needs to know about it is derived — never written twice.</text>
+
+  <!-- declaration -->
+  <rect x="40" y="130" width="290" height="160" rx="7" fill="#ffffff" stroke="#3b6ea5" stroke-width="2.2"/>
+  <text x="60" y="160" font-size="15" font-weight="600" fill="#1b2430">The declaration</text>
+  <text x="60" y="180" font-size="12.5" fill="#5a6675">inventory/host_vars/&lt;host&gt;.yml</text>
+  <rect x="60" y="196" width="250" height="76" rx="5" fill="#f3f6f9" stroke="#cfd8e3"/>
+  <g font-family="ui-monospace, Consolas, monospace" font-size="12" fill="#3f4a59">
+    <text x="74" y="216">services:</text>
+    <text x="74" y="234">  - name: docs</text>
+    <text x="74" y="252">    port: 6875</text>
+    <text x="74" y="266">    description: ...</text>
+  </g>
+
+  <!-- contract role -->
+  <rect x="404" y="168" width="180" height="84" rx="7" fill="#1b2430"/>
+  <text x="494" y="202" text-anchor="middle" font-size="15" font-weight="600" fill="#ffffff">contract role</text>
+  <text x="494" y="224" text-anchor="middle" font-size="12" fill="#b9c4d1">derives, never reconciles</text>
+  <path d="M 330 210 L 404 210" stroke="#3b6ea5" stroke-width="2.2" fill="none" marker-end="url(#d-arrow)"/>
+
+  <!-- four consumers -->
+  <g>
+    <rect x="676" y="112" width="404" height="58" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
+    <text x="696" y="138" font-size="14" font-weight="600" fill="#1b2430">Reverse-proxy route</text>
+    <text x="696" y="157" font-size="12.5" fill="#5a6675">a name under the wildcard, on the one site block</text>
+
+    <rect x="676" y="182" width="404" height="58" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
+    <text x="696" y="208" font-size="14" font-weight="600" fill="#1b2430">Dashboard card</text>
+    <text x="696" y="227" font-size="12.5" fill="#5a6675">group, icon and description — no credential</text>
+
+    <rect x="676" y="252" width="404" height="58" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
+    <text x="696" y="278" font-size="14" font-weight="600" fill="#1b2430">Uptime check</text>
+    <text x="696" y="297" font-size="12.5" fill="#5a6675">an endpoint, with its own alerting path</text>
+
+    <rect x="676" y="322" width="404" height="58" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
+    <text x="696" y="348" font-size="14" font-weight="600" fill="#1b2430">Metric and probe targets</text>
+    <text x="696" y="367" font-size="12.5" fill="#5a6675">scrape target and blackbox probe</text>
+  </g>
+  <path d="M 584 196 C 630 196, 630 141, 676 141" stroke="#3b6ea5" stroke-width="2" fill="none" marker-end="url(#d-arrow)"/>
+  <path d="M 584 205 C 630 205, 630 211, 676 211" stroke="#3b6ea5" stroke-width="2" fill="none" marker-end="url(#d-arrow)"/>
+  <path d="M 584 220 C 630 220, 630 281, 676 281" stroke="#3b6ea5" stroke-width="2" fill="none" marker-end="url(#d-arrow)"/>
+  <path d="M 584 232 C 630 232, 630 351, 676 351" stroke="#3b6ea5" stroke-width="2" fill="none" marker-end="url(#d-arrow)"/>
+
+  <!-- deletion -->
+  <line x1="40" y1="424" x2="1080" y2="424" stroke="#e2e6ec" stroke-width="1.4"/>
+  <text x="40" y="456" font-size="16" font-weight="600" fill="#1b2430">Deleting the declaration</text>
+
+  <rect x="40" y="474" width="500" height="102" rx="7" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
+  <text x="60" y="500" font-size="14" font-weight="600" fill="#3b6ea5">Drops by itself</text>
+  <text x="60" y="522" font-size="12.5" fill="#5a6675">The proxy route · the dashboard card · the uptime check ·</text>
+  <text x="60" y="540" font-size="12.5" fill="#5a6675">the metric and probe targets.</text>
+  <text x="60" y="562" font-size="12.5" fill="#5a6675">Four consumers removed by one deleted entry.</text>
+
+  <rect x="580" y="474" width="500" height="102" rx="7" fill="#ffffff" stroke="#a03d3d" stroke-width="1.6"/>
+  <text x="600" y="500" font-size="14" font-weight="600" fill="#a03d3d">Does not</text>
+  <text x="600" y="522" font-size="12.5" fill="#5a6675">The intrusion-detection agent registration — nothing derives it,</text>
+  <text x="600" y="540" font-size="12.5" fill="#5a6675">so it persists and shows as broken rather than absent.</text>
+  <text x="600" y="562" font-size="12.5" fill="#5a6675">Host-key entries. Backup archives, which outlive the guest.</text>
+  <path d="M 556 525 L 578 525" stroke="#a03d3d" stroke-width="2" fill="none" marker-end="url(#d-arrowRed)"/>
+</svg>

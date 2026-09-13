@@ -22,7 +22,6 @@ the things themselves.
 
 | If you want | Read |
 |---|---|
-| Segmentation, firewall policy, DNS and ingress | [docs/network/](docs/network/README.md) |
 | The home side — IoT, cameras, automation | [docs/home/](docs/home/README.md) |
 | How a service gets deployed, and reviewed | [docs/operations/](docs/operations/reviewing-a-service.md) |
 | **The interesting part** | [docs/findings/](docs/findings/) |
@@ -33,10 +32,10 @@ the things themselves.
 
 ## The environment in one page
 
-**Network** — six VLANs behind a firewall that is both gateway and policy point, with a managed
-switch carrying tagged trunks. Seven rules govern the server VLAN in total. IoT and cameras are
-isolated, and the exceptions are enumerated rather than assumed. A mesh VPN provides remote access
-and a subnet route, which is deliberately a hole in the segmentation and is written down as one.
+**Network** — six VLANs behind a firewall that is both gateway and the only inter-VLAN policy
+point, with a managed switch carrying tagged trunks. The segmentation write-up is being redone
+against an export of the live ruleset rather than against my notes; see
+[the findings index](docs/findings/) when it lands.
 
 **Platform** — three Proxmox nodes in a cluster, every guest declared in Terraform, configuration by
 Ansible from a dedicated controller. Two plays run estate-wide on a schedule. Guests are containers
@@ -57,6 +56,16 @@ read-only deploy key, the vault delivered out of band, and SSH pinned by source 
 
 **Home** — automation and cameras on isolated VLANs, documented as a design rather than as a floor
 plan. See [the scoping note](docs/home/README.md) for what is deliberately absent.
+
+---
+
+## How a service is declared
+
+![One declaration, four consumers](diagrams/service-derivation.svg)
+
+## How an alert reaches a person
+
+![Many detectors, one pager](diagrams/detectors-to-pager.svg)
 
 ---
 
