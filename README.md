@@ -22,6 +22,7 @@ the things themselves.
 
 | If you want | Read |
 |---|---|
+| The cluster, Terraform, Ansible, credential scopes | [docs/platform/](docs/platform/README.md) |
 | The home side — IoT, cameras, automation | [docs/home/](docs/home/README.md) |
 | How a service gets deployed, and reviewed | [docs/operations/](docs/operations/reviewing-a-service.md) |
 | **The interesting part** | [docs/findings/](docs/findings/) |
