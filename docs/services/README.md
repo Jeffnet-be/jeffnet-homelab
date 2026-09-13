@@ -38,9 +38,19 @@ a commercial password manager that already has a mobile client and a recovery st
 
 ![One declaration, four consumers](../../diagrams/service-derivation.svg)
 
-A service is declared **once**, in the host's variables, with its name, port and a one-line
-description. A `contract` role derives everything else: the proxy route, the dashboard card, the
-uptime check, and the metrics and probe targets.
+A service is declared **once**, in the host's variables: an identifier, the DNS name it answers to,
+a port, and an authentication mode. A `contract` role derives everything else — FQDN, upstream,
+slug, expected health status — and every renderer consumes that one list: the proxy route, the
+forward-auth policy, the dashboard card, the uptime check, and the metrics and probe targets.
+
+The same list also carries services that are **not** Ansible hosts — hypervisor UIs, the switch
+controller, the firewall — which state their own address instead of getting one from inventory.
+Keeping both in one list is what makes the uniqueness checks meaningful: a collision between a
+managed service and an unmanaged one is invisible from either list alone.
+
+The role is published in full, lightly generalised, in
+[examples/service-contract](../../examples/ansible/service-contract/) — including the seven guards
+that hold across both sources.
 
 **Add an entry, never a block.** The rule that makes this work is that no consumer is ever written
 by hand — if the dashboard needs a card, the card comes from the declaration or it doesn't exist.

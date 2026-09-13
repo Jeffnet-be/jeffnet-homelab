@@ -1,0 +1,172 @@
+---
+# roles/contract/tasks/main.yml
+#
+# ONE definition of "which services exist" — covering BOTH sources:
+#   * `services` in host_vars, for anything Ansible manages
+#   * `proxy_external_services` in group_vars/all, for anything it doesn't
+#     (the hypervisors, the switch controller, the firewall — real services,
+#     just not our hosts)
+#
+# Every renderer (reverse proxy, forward-auth ACL, dashboard, uptime checks,
+# metrics) consumes `proxied_services` and never touches hostvars itself.
+#
+# Runs FIRST in the services play. No connection, no remote work — running it
+# on every host is free. (`run_once: true` would be wrong: set_fact only lands
+# on the host that ran it.)
+
+- name: Reset the contract
+  ansible.builtin.set_fact:
+    _contract_flat: []
+    _contract: []
+
+# --- Pass 1a: inventory-managed services ----------------------------------
+# `map('combine', {...})` works because host and ip are constant per inner list.
+- name: Aggregate services from every host in the contract group
+  ansible.builtin.set_fact:
+    _contract_flat: >-
+      {{ _contract_flat + (
+           hostvars[item].services | default([], true)
+           | selectattr('dns_name', 'defined')
+           | map('combine', {
+               'source': 'inventory',
+               'host':   item,
+               'ip':     hostvars[item].ansible_host
+             })
+           | list
+         ) }}
+  loop: "{{ groups[contract_group | default('services')] | sort }}"
+  loop_control:
+    label: "{{ item }}"
+
+# `default([], true)` — the `true` matters. A host with an empty `services:`
+# key yields None, and plain `default([])` does not catch None.
+
+# --- Pass 1b: services that are not Ansible hosts --------------------------
+# Same field contract, but `host` is already an address rather than an
+# inventory name, so there is no hostvars lookup. Normalised in pass 2.
+- name: Fold in external services
+  ansible.builtin.set_fact:
+    _contract_flat: >-
+      {{ _contract_flat + (
+           proxy_external_services | default([], true)
+           | selectattr('dns_name', 'defined')
+           | map('combine', {'source': 'external'})
+           | list
+         ) }}
+
+# --- Pass 2: derive --------------------------------------------------------
+# The list is flat now, so `item` is a service and per-service fields can be
+# computed. Derived once here; templates never re-derive.
+- name: Derive fqdn, slug, upstream and contract defaults
+  ansible.builtin.set_fact:
+    _contract: >-
+      {{ _contract + [ item | combine({
+           'source':          item.source,
+           'ip':              _ip,
+           'fqdn':            item.dns_name ~ '.' ~ lab_domain,
+           'slug':            item.name | lower
+                                | regex_replace('[^a-z0-9]+', '_')
+                                | regex_replace('^_+|_+$', ''),
+           'scheme':          _scheme,
+           'port':            _port,
+           'auth':            item.auth          | default('none'),
+           'health_path':     item.health_path   | default('/'),
+           'expect_status':   item.expect_status | default(
+                                'any(200, 302)'
+                                if (item.auth | default('none')) == 'forward'
+                                else '200'
+                              ),
+           'tls_skip_verify': item.tls_skip_verify | default(false),
+           'upstream':        _scheme ~ '://' ~ _ip ~ ':' ~ _port
+         }) ] }}
+  vars:
+    # An inventory service has `ip` from ansible_host; an external one carries
+    # its address in `host`. After this line nothing downstream cares which.
+    _ip: "{{ item.ip | default(item.host) }}"
+    _scheme: "{{ item.scheme | default('http') }}"
+    _port: "{{ item.port | default(80) }}"
+  loop: "{{ _contract_flat }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Publish the contract
+  ansible.builtin.set_fact:
+    proxied_services: "{{ _contract }}"
+
+# --------------------------------------------------------------------------
+# Guards — the point of having one definition. These hold across BOTH sources,
+# which no per-template loop could ever check.
+# --------------------------------------------------------------------------
+
+- name: Assert the contract is not empty
+  ansible.builtin.assert:
+    that: proxied_services | length > 0
+    fail_msg: >-
+      proxied_services is empty. Either group '{{ contract_group | default('services') }}'
+      has no members with a `services:` entry, or proxy_external_services is unset.
+
+- name: Assert service names are unique across inventory and external services
+  ansible.builtin.assert:
+    that:
+      - proxied_services | map(attribute='name') | list | length
+        == proxied_services | map(attribute='name') | unique | list | length
+    fail_msg: >-
+      Duplicate service `name`. Uptime history keys on group+name and proxy
+      matcher slugs derive from it — duplicates collide silently. `name` is an
+      identifier, not a label. This check is the reason both sources belong in
+      one list: a collision between an inventory service and an external one
+      was previously invisible.
+
+- name: Assert dns_names are unique across inventory and external services
+  ansible.builtin.assert:
+    that:
+      - proxied_services | map(attribute='dns_name') | list | length
+        == proxied_services | map(attribute='dns_name') | unique | list | length
+    fail_msg: >-
+      Duplicate `dns_name`. Two services would claim the same FQDN and the proxy
+      would serve whichever route rendered last — no error, just the wrong site.
+
+- name: Assert auth values are known
+  ansible.builtin.assert:
+    that:
+      - proxied_services | rejectattr('auth', 'in', ['none', 'internal', 'basic', 'forward'])
+        | list | length == 0
+    fail_msg: >-
+      Unknown `auth` value. Allowed: none | internal | basic | forward.
+      A typo would otherwise render as no protection at all — auth must fail closed.
+
+- name: Assert the identity provider is deployed if anything requests forward auth
+  ansible.builtin.assert:
+    that:
+      - proxied_services | selectattr('auth', 'eq', 'forward') | list | length == 0
+        or (forward_auth_enabled | default(false) | bool)
+    fail_msg: >-
+      A service requests `auth: forward` but the identity provider is not enabled.
+      Rendering it anyway would publish the service unauthenticated.
+
+- name: Assert a basic-auth hash exists if any service requests it
+  ansible.builtin.assert:
+    that:
+      - proxied_services | selectattr('auth', 'eq', 'basic') | list | length == 0
+        or proxy_basic_auth_hash is defined
+    fail_msg: >-
+      A service requests `auth: basic` but no hash is configured. The capability
+      exists; the credential is not assumed to.
+
+- name: Assert every external service has an address
+  ansible.builtin.assert:
+    that:
+      - proxied_services | selectattr('source', 'eq', 'external')
+        | rejectattr('ip', 'defined') | list | length == 0
+    fail_msg: >-
+      An entry in proxy_external_services has no `host`. Inventory services get
+      their address from ansible_host; external ones must state it.
+
+- name: Show the contract
+  ansible.builtin.debug:
+    msg: >-
+      {{ proxied_services | length }} services
+      ({{ proxied_services | selectattr('source','eq','inventory') | list | length }} inventory,
+      {{ proxied_services | selectattr('source','eq','external') | list | length }} external):
+      {{ proxied_services | map(attribute='slug') | sort | join(', ') }}
+  run_once: true

@@ -17,5 +17,6 @@ and a less honest one, and the dead theories are usually where the interesting r
 
 | Date | Finding | Class |
 |---|---|---|
+| 2026-09-02 | [The guard that could not fail](2026-09-02-the-guard-that-could-not-fail.md) | The control was the defect |
 | 2026-08-24 | [The backup that never existed](2026-08-24-the-backup-that-never-existed.md) | Fully declared, and fully unheard |
 | 2026-08-20 | [The door that was closed on purpose](2026-08-20-the-enrolment-window.md) | Correct hardening, unwritten consequence |
