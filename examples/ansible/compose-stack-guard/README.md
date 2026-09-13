@@ -5,7 +5,7 @@ Two facts that look like one:
 - **`.env` substitutes.** Docker Compose reads it to expand `${VAR}` *in the compose file itself*.
 - **`env_file:` injects.** Only that puts variables inside the container's environment.
 
-A stack can therefore render thirty-nine variables into a `.env` that the application never sees —
+A stack can therefore render thirty-nine variables into a `.env` that the application never sees -
 which is exactly what happened here, with eleven consumed beside thirty-nine rendered, for weeks.
 
 This guard compares what the template *declares* against what the running container *received*, and
@@ -18,13 +18,13 @@ false positive on the one host that was outside the nightly convergence. Three d
 in the guard rather than in what it measured:
 
 1. **The target was a guess.** The container to inspect was referenced only as
-   `| default(stack_name)` — and nothing in the repository ever *set* it. That is correct by
+   `| default(stack_name)` - and nothing in the repository ever *set* it. That is correct by
    coincidence wherever the container happens to share the stack's name, and wrong everywhere else.
    A `| default()` on a variable nothing ever defines is a guess, not a default.
 2. **The read could not fail.** `docker inspect x | python3 -c '...' | sort -u` returns **`sort`'s**
    exit status. The inspect failed, python died on empty input, `sort` succeeded on nothing, and
    Ansible saw a clean task with empty output. An empty list then passes every comparison it is
-   subtracted *from* and fails every one it is subtracted *into* — hence a false pass on some stacks
+   subtracted *from* and fails every one it is subtracted *into* - hence a false pass on some stacks
    and a false alarm on another.
 3. **The assert and its message were two expressions that had to agree.** The same four-term
    difference chain, written twice.
@@ -33,17 +33,17 @@ in the guard rather than in what it measured:
 
 - `set -o pipefail` with `executable: /bin/bash` on **every** read, and an explicit return-code
   contract per read, because the contracts genuinely differ:
-  - well-formedness: rc 0 **or 1** — `grep -v` exits 1 when it finds nothing, which is the healthy
+  - well-formedness: rc 0 **or 1** - `grep -v` exits 1 when it finds nothing, which is the healthy
     case
-  - declared keys: rc 0 or 1, **and non-empty** — a template that declares nothing is a defect
-  - substitution keys: rc 0 or 1, **empty is valid** — zero `${}` is normal for an `env_file` stack
-  - container keys: **rc 0 and non-empty** — so "could not read" is never mistaken for "received
+  - declared keys: rc 0 or 1, **and non-empty** - a template that declares nothing is a defect
+  - substitution keys: rc 0 or 1, **empty is valid** - zero `${}` is normal for an `env_file` stack
+  - container keys: **rc 0 and non-empty** - so "could not read" is never mistaken for "received
     none"
 - The difference computed **once** with `set_fact`, used by both the assert and its message.
 - **Every `| default([])` removed from the assert.** They were only load-bearing because the reads
   could silently produce nothing; with the reads honest, a default could only hide something.
 - The primary-container name **required per stack** and set explicitly even where it equals the
-  stack name — a fact rather than a coincidence.
+  stack name - a fact rather than a coincidence.
 - The declaration assert runs **before** the stack is brought up: it checks a declaration, not
   state, so it should fail before any work is done.
 - Two `block:`s, each gated once on the template's existence, rather than a `when:` repeated per
@@ -52,7 +52,7 @@ in the guard rather than in what it measured:
 
 ## Proving it
 
-Add a key to one stack's `.env` template that no container will ever receive — `GUARD_CANARY` — and
+Add a key to one stack's `.env` template that no container will ever receive - `GUARD_CANARY` - and
 confirm the assert fails and names it. Then remove it.
 
 Do this **again after any change to the guard**: the old proof does not carry over when the reads,
@@ -72,7 +72,7 @@ failed_when:
   - _received.stdout_lines | length == 0
 ```
 
-the task only fails when the command errored **and** returned nothing — so a read that errors while
+the task only fails when the command errored **and** returned nothing - so a read that errors while
 still printing something passes, and so does a read that succeeds while printing nothing. Two
 return-code contracts silently become one. Write the disjunction explicitly:
 

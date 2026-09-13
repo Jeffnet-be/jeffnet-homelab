@@ -15,9 +15,9 @@ This was the second time in four days that a guard on this estate turned out to 
 
 On the one host that sits **outside** the nightly convergence run. That host was the least-converged
 in the estate, so it was the first to run the guard as it had been written rather than as it had
-been patched — and it produced a finding within the hour of an unrelated investigation.
+been patched - and it produced a finding within the hour of an unrelated investigation.
 
-> **A guard is only as reliable as the least-converged host in its group** — and that host is where
+> **A guard is only as reliable as the least-converged host in its group** - and that host is where
 > its defects surface, late.
 
 ## The symptom
@@ -28,7 +28,7 @@ container carried the environment file and had all three. The complaint was fals
 ## Three defects, all inside the guard
 
 **1. The target was a guess.** The guard inspected a container whose name came from a variable
-referenced only as `| default(stack_name)` — and **nothing in the repository ever set that
+referenced only as `| default(stack_name)` - and **nothing in the repository ever set that
 variable.** So it always inspected a container named after the stack. That is correct by coincidence
 wherever a stack happens to run a container of the same name, and wrong everywhere else. On this
 host the containers were named after components, and nothing was called after the stack at all.
@@ -57,13 +57,13 @@ And an empty list is not neutral:
 **All four reads in the role shared the defect.** Three ended in `sort`, one in `cut`.
 
 **3. The assert and its message were two expressions that had to agree.** The same four-term
-comparison was written twice — once in the condition, once in the failure message. Two copies of one
+comparison was written twice - once in the condition, once in the failure message. Two copies of one
 fact, kept in sync by hand.
 
 ## The precedent, three days earlier
 
 A different guard, same class. Its comparison included a `| default([])` on the list it compared
-*from*, so whenever that list was empty — which was the failing case it existed to catch — the
+*from*, so whenever that list was empty - which was the failing case it existed to catch - the
 difference was empty too and the assert passed. It had been green for three runs and had never been
 able to do anything else.
 
@@ -73,11 +73,11 @@ condition it was written for.**
 ## What changed
 
 - **`set -o pipefail`** with an explicit bash executable on every read, and **an explicit return-code
-  contract per read** — because the correct contracts genuinely differ. One read is healthy when it
+  contract per read** - because the correct contracts genuinely differ. One read is healthy when it
   finds nothing and exits non-zero. Another is defective if it returns nothing at all. A single rule
   would have been wrong for at least one of them.
 - **The primary container is now required per stack**, and set explicitly even where it equals the
-  stack name — a fact rather than a coincidence.
+  stack name - a fact rather than a coincidence.
 - **The declaration check runs before the stack is brought up**, because it checks a declaration
   rather than state, and should fail before any work is done.
 - **The comparison is computed once** and used by both the condition and the message.
@@ -87,13 +87,13 @@ condition it was written for.**
 
 ## Proving it
 
-A canary key was added to one stack's environment template — a variable no container would ever
-receive — and the guard failed and named it. Then the canary was removed.
+A canary key was added to one stack's environment template - a variable no container would ever
+receive - and the guard failed and named it. Then the canary was removed.
 
 The previous proof did **not** carry over. The reads, the return-code contracts and the comparison
 had all been rewritten; what had been proven was a different control that happened to share a name.
 
-> **Prove a guard denies by breaking what it compares against — and re-prove it after you change the
+> **Prove a guard denies by breaking what it compares against - and re-prove it after you change the
 > guard.** Proving that a control *allows* is not proving that it denies.
 
 ## The general lesson
@@ -102,13 +102,13 @@ Every control in this estate is now assumed guilty until it has been observed re
 The specific questions that come out of these two:
 
 - **Does every stage of this check report its own failure**, or only the last one?
-- **What does this check do when its input is empty** — and is empty a valid answer here, or a symptom?
+- **What does this check do when its input is empty** - and is empty a valid answer here, or a symptom?
 - **Is any value in this check a guess dressed as a default?**
 - **When did this last deny something**, and was it a real fault or a fabricated test?
 
 ### The professional twin
 
-Audits and compliance checks fail this way constantly, and they fail *quietly* — a script that
+Audits and compliance checks fail this way constantly, and they fail *quietly* - a script that
 enumerates non-compliant machines, an API call whose credential silently expired, an empty result
 set, and a report reading zero findings. **An audit that finds nothing deserves exactly the
 scepticism of a control that reports success.**

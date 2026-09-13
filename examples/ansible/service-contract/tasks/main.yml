@@ -1,16 +1,16 @@
 ---
 # roles/contract/tasks/main.yml
 #
-# ONE definition of "which services exist" — covering BOTH sources:
+# ONE definition of "which services exist" - covering BOTH sources:
 #   * `services` in host_vars, for anything Ansible manages
 #   * `proxy_external_services` in group_vars/all, for anything it doesn't
-#     (the hypervisors, the switch controller, the firewall — real services,
+#     (the hypervisors, the switch controller, the firewall - real services,
 #     just not our hosts)
 #
 # Every renderer (reverse proxy, forward-auth ACL, dashboard, uptime checks,
 # metrics) consumes `proxied_services` and never touches hostvars itself.
 #
-# Runs FIRST in the services play. No connection, no remote work — running it
+# Runs FIRST in the services play. No connection, no remote work - running it
 # on every host is free. (`run_once: true` would be wrong: set_fact only lands
 # on the host that ran it.)
 
@@ -38,7 +38,7 @@
   loop_control:
     label: "{{ item }}"
 
-# `default([], true)` — the `true` matters. A host with an empty `services:`
+# `default([], true)` - the `true` matters. A host with an empty `services:`
 # key yields None, and plain `default([])` does not catch None.
 
 # --- Pass 1b: services that are not Ansible hosts --------------------------
@@ -94,7 +94,7 @@
     proxied_services: "{{ _contract }}"
 
 # --------------------------------------------------------------------------
-# Guards — the point of having one definition. These hold across BOTH sources,
+# Guards - the point of having one definition. These hold across BOTH sources,
 # which no per-template loop could ever check.
 # --------------------------------------------------------------------------
 
@@ -112,7 +112,7 @@
         == proxied_services | map(attribute='name') | unique | list | length
     fail_msg: >-
       Duplicate service `name`. Uptime history keys on group+name and proxy
-      matcher slugs derive from it — duplicates collide silently. `name` is an
+      matcher slugs derive from it - duplicates collide silently. `name` is an
       identifier, not a label. This check is the reason both sources belong in
       one list: a collision between an inventory service and an external one
       was previously invisible.
@@ -124,7 +124,7 @@
         == proxied_services | map(attribute='dns_name') | unique | list | length
     fail_msg: >-
       Duplicate `dns_name`. Two services would claim the same FQDN and the proxy
-      would serve whichever route rendered last — no error, just the wrong site.
+      would serve whichever route rendered last - no error, just the wrong site.
 
 - name: Assert auth values are known
   ansible.builtin.assert:
@@ -133,7 +133,7 @@
         | list | length == 0
     fail_msg: >-
       Unknown `auth` value. Allowed: none | internal | basic | forward.
-      A typo would otherwise render as no protection at all — auth must fail closed.
+      A typo would otherwise render as no protection at all - auth must fail closed.
 
 - name: Assert the identity provider is deployed if anything requests forward auth
   ansible.builtin.assert:

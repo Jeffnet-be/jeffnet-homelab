@@ -1,7 +1,7 @@
 # The platform
 
 Three hypervisor nodes in a cluster, every guest declared in Terraform, every host configured by
-Ansible. The interesting parts are not the tools — they are the separation of who may author, who
+Ansible. The interesting parts are not the tools - they are the separation of who may author, who
 may execute, and who may read what.
 
 ---
@@ -12,11 +12,11 @@ Three nodes, deliberately **asymmetric**. They were acquired at different times 
 core counts and memory, and pretending otherwise would mean placing workloads against an average
 that doesn't exist. Each node has a role, and every workload is placed against actual hardware:
 
-- **Ingress and control plane** — the reverse proxy, identity, the automation controller, shared
+- **Ingress and control plane** - the reverse proxy, identity, the automation controller, shared
   storage for one peer.
-- **Observability** — the metrics stack, the network monitor, a second resolver, and the push
+- **Observability** - the metrics stack, the network monitor, a second resolver, and the push
   service that every alert terminates on.
-- **Capacity** — the largest node, carrying the workloads that actually consume something, plus
+- **Capacity** - the largest node, carrying the workloads that actually consume something, plus
   shared storage for the other two and the primary remote-access route.
 
 Three nodes is the smallest cluster that can hold quorum through the loss of one, which is the whole
@@ -30,7 +30,7 @@ than to the guest.
 ### Failure domains are enumerated, not assumed
 
 The design was sound and the placement was not. A single node once held ingress (and therefore every
-hostname in the estate), identity, the automation controller, remote access — **and the monitoring
+hostname in the estate), identity, the automation controller, remote access - **and the monitoring
 host, so nothing could report the outage.** One loose cable took all of it.
 
 Placement includes the path a message takes. A detector that lives on the node it watches produces
@@ -48,7 +48,7 @@ The split matters for a reason that isn't obvious until it bites: **`terraform s
 state.** Ask "is everything under Terraform?" in a multi-state repo and you get an answer scoped to
 whichever directory you happened to be standing in.
 
-State lives in **remote object storage**, and CI authenticates to it with **OIDC** — a short-lived
+State lives in **remote object storage**, and CI authenticates to it with **OIDC** - a short-lived
 federated token per run rather than a stored credential. There is no cloud secret in the repository
 or in the CI configuration to leak or rotate.
 
@@ -58,7 +58,7 @@ Read every plan: **`# forces replacement` first, then the resource key, then the
 that have caught me:
 
 - **SSH keys in the guest initialisation block.** Changing them forces replacement of *every*
-  container. Terraform is the wrong layer for SSH keys — they belong to configuration management,
+  container. Terraform is the wrong layer for SSH keys - they belong to configuration management,
   which can converge them without rebuilding the guest.
 - **Anything inside a clone block**, and the node assignment.
 - **Purging on destroy** strips the guest's ID out of backup jobs and high-availability
@@ -78,7 +78,7 @@ deployed and a project three months later.
 Roles live in the same repository as the Terraform, cloned to a dedicated controller. Two things
 are worth copying:
 
-**A role that must run everywhere gets its own play — and a play that must run everywhere gets a
+**A role that must run everywhere gets its own play - and a play that must run everywhere gets a
 schedule.** The baseline role runs against every host in the estate as a standalone play. The
 endpoint-agent play does the same. The second one existed and was *correct* for weeks while never
 having been scheduled, so nothing re-ran after a guest was rebuilt, and a host silently lost its
@@ -100,7 +100,7 @@ This is the part I would keep in any environment, at any size.
 | **Repository access** | Write, both remotes | Read-only clone | Read-only deploy key, one repository |
 | **Holds the vault?** | No | Yes, with the password | Delivered out of band, mounted read-only |
 | **Can push?** | Yes | No | No |
-| **SSH reach** | — | The estate | One inventory group, pinned by source address |
+| **SSH reach** | - | The estate | One inventory group, pinned by source address |
 
 **The machine that executes the code should not be able to rewrite it.** That used to be a
 convention, which meant it existed only while a person was doing the work. It is now a read-only
@@ -111,7 +111,7 @@ Two supporting decisions:
 - **The vault is not in git**, Git's purpose is to replicate a file to every copy of the repository, and a secret's requirement is that it doesn't. Those are opposite properties, and no amount of care about which remotes exist changes which one git is for. The vault is delivered out of band and mounted read-only.
 - **A deploy key beat a personal access token** on a documentation question. With two-factor
   enabled, the vendor's docs do not settle whether a token bypasses the second factor for
-  git-over-HTTP, nor whether a read scope is sufficient to deny a push — two ambiguities on exactly
+  git-over-HTTP, nor whether a read scope is sufficient to deny a push - two ambiguities on exactly
   the properties that decide whether a credential is really read-only. A deploy key has neither
   ambiguity: SSH never touches the account's password path, and read-only is enforced per repository.
 

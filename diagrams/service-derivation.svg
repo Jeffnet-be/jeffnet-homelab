@@ -10,7 +10,7 @@
   <rect x="0" y="0" width="1120" height="700" fill="#f7f8fa"/>
 
   <text x="40" y="52" font-size="25" font-weight="600" fill="#1b2430">One contract, two sources, five consumers</text>
-  <text x="40" y="78" font-size="14.5" fill="#5a6675">A service is declared once. Everything that needs to know about it is derived — and no renderer ever reads inventory directly.</text>
+  <text x="40" y="78" font-size="14.5" fill="#5a6675">A service is declared once. Everything that needs to know about it is derived - and no renderer ever reads inventory directly.</text>
 
   <!-- declaration -->
   <rect x="40" y="130" width="290" height="176" rx="7" fill="#ffffff" stroke="#3b6ea5" stroke-width="2.2"/>
@@ -45,11 +45,11 @@
 
     <rect x="676" y="182" width="404" height="58" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
     <text x="696" y="208" font-size="14" font-weight="600" fill="#1b2430">Forward-auth policy</text>
-    <text x="696" y="227" font-size="12.5" fill="#5a6675">auth mode per service — unknown values fail the run</text>
+    <text x="696" y="227" font-size="12.5" fill="#5a6675">auth mode per service - unknown values fail the run</text>
 
     <rect x="676" y="252" width="404" height="58" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
     <text x="696" y="278" font-size="14" font-weight="600" fill="#1b2430">Dashboard card</text>
-    <text x="696" y="297" font-size="12.5" fill="#5a6675">group, icon and description — no credential</text>
+    <text x="696" y="297" font-size="12.5" fill="#5a6675">group, icon and description - no credential</text>
 
     <rect x="676" y="322" width="404" height="58" rx="6" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.6"/>
     <text x="696" y="348" font-size="14" font-weight="600" fill="#1b2430">Uptime check</text>
@@ -77,7 +77,7 @@
 
   <rect x="580" y="540" width="500" height="102" rx="7" fill="#ffffff" stroke="#a03d3d" stroke-width="1.6"/>
   <text x="600" y="566" font-size="14" font-weight="600" fill="#a03d3d">Does not</text>
-  <text x="600" y="588" font-size="12.5" fill="#5a6675">The intrusion-detection agent registration — nothing derives it,</text>
+  <text x="600" y="588" font-size="12.5" fill="#5a6675">The intrusion-detection agent registration - nothing derives it,</text>
   <text x="600" y="606" font-size="12.5" fill="#5a6675">so it persists and shows as broken rather than absent.</text>
   <text x="600" y="628" font-size="12.5" fill="#5a6675">Host-key entries. Backup archives, which outlive the guest.</text>
   <path d="M 556 591 L 578 591" stroke="#a03d3d" stroke-width="2" fill="none" marker-end="url(#d-arrowRed)"/>

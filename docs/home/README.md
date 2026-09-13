@@ -6,7 +6,7 @@ these docs exist because of them.
 
 ## What is documented here
 
-- **Why IoT and cameras are isolated**, and what "isolated" is actually enforcing — which direction
+- **Why IoT and cameras are isolated**, and what "isolated" is actually enforcing - which direction
   is blocked, what the exceptions are, and how each one was verified rather than assumed.
 - **The automation platform's failure domain.** It runs on the same cluster as everything else,
   which is a decision with consequences worth stating.

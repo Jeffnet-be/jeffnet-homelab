@@ -128,4 +128,4 @@
         fail_msg: >-
           Declared in .env but never delivered to '{{ stack_primary_container }}':
           {{ _undelivered | join(', ') }}.
-          Check that the service carries env_file: .env — .env substitutes, env_file injects.
+          Check that the service carries env_file: .env - .env substitutes, env_file injects.

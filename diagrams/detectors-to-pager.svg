@@ -61,7 +61,7 @@
   <g font-size="13" fill="#5a6675">
     <text x="40" y="482" font-weight="600" fill="#1b2430">Why this shape.</text>
     <text x="40" y="506">Detection and delivery are separate facts. Every technical control here once worked perfectly while nobody was subscribed</text>
-    <text x="40" y="526">on a device that interrupts — seven real alerts, and the outcome was identical to having no monitoring at all.</text>
+    <text x="40" y="526">on a device that interrupts - seven real alerts, and the outcome was identical to having no monitoring at all.</text>
     <text x="40" y="552" fill="#1b2430" font-weight="600">A control is finished when a person is interrupted, not when the notification is sent.</text>
     <text x="40" y="576">Ask where the alert goes of every subsystem separately. Recording is not alerting.</text>
   </g>
