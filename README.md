@@ -1,7 +1,5 @@
 # jeffnet-homelab
-
-Documentation of my home network and homelab - the architecture, the patterns I reuse, and what
-reviewing all of it turned up.
+Documentation of my homelab and home network - architecture, reusable patterns, lessons learned, and security-focused improvements.
 
 It covers the whole environment rather than one rack: a segmented network behind a firewall doing
 all inter-VLAN policy, a three-node Proxmox cluster built with Terraform and Ansible, the
