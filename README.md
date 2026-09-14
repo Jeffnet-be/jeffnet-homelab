@@ -1,6 +1,6 @@
 # jeffnet-homelab
 
-Documentation of my home network and homelab — the architecture, the patterns I reuse, and what
+Documentation of my home network and homelab - the architecture, the patterns I reuse, and what
 reviewing all of it turned up.
 
 It covers the whole environment rather than one rack: a segmented network behind a firewall doing
@@ -14,7 +14,7 @@ the things themselves.
 
 > **Scope note.** This is documentation, not the estate. The infrastructure code lives in a private
 > repository; nothing here is generated from it and nothing here is applied to anything. Internal
-> names, addresses and identifiers are substituted throughout — see [SETUP.md](SETUP.md).
+> names, addresses and identifiers are substituted throughout - see [SETUP.md](SETUP.md).
 
 ---
 
@@ -24,7 +24,7 @@ the things themselves.
 |---|---|
 | The cluster, Terraform, Ansible, credential scopes | [docs/platform/](docs/platform/README.md) |
 | The estate, and how a service is declared | [docs/services/](docs/services/README.md) |
-| The home side — IoT, cameras, automation | [docs/home/](docs/home/README.md) |
+| The home side - IoT, cameras, automation | [docs/home/](docs/home/README.md) |
 | How a service gets deployed, and reviewed | [docs/operations/](docs/operations/reviewing-a-service.md) |
 | **The interesting part** | [docs/findings/](docs/findings/) |
 | The rules that came out of it | [docs/principles/](docs/principles/README.md) |
@@ -34,29 +34,29 @@ the things themselves.
 
 ## The environment in one page
 
-**Network** — six VLANs behind a firewall that is both gateway and the only inter-VLAN policy
+**Network** - six VLANs behind a firewall that is both gateway and the only inter-VLAN policy
 point, with a managed switch carrying tagged trunks. The segmentation write-up is being redone
 against an export of the live ruleset rather than against my notes; see
 [the findings index](docs/findings/) when it lands.
 
-**Platform** — three Proxmox nodes in a cluster, every guest declared in Terraform, configuration by
+**Platform** - three Proxmox nodes in a cluster, every guest declared in Terraform, configuration by
 Ansible from a dedicated controller. Two plays run estate-wide on a schedule. Guests are containers
 except where the workload forbids it.
 
-**Ingress** — one reverse proxy, one site block, one wildcard certificate over DNS-01, one
+**Ingress** - one reverse proxy, one site block, one wildcard certificate over DNS-01, one
 split-horizon wildcard DNS record. A service is declared once and *derived* into its proxy route,
 dashboard card, uptime check and metric targets. Adding one is an entry, never a block; deleting one
 removes all four by itself.
 
-**Observability** — probes at three layers, network monitoring by SNMP, config backup by SSH, log
+**Observability** - probes at three layers, network monitoring by SNMP, config backup by SSH, log
 aggregation, and host-based intrusion detection on every guest. Detectors publish to a single push
 service with one write-only identity each, and one phone subscription.
 
-**Credentials** — three roles, three scopes, no overlap. The workstation authors. The controller
+**Credentials** - three roles, three scopes, no overlap. The workstation authors. The controller
 executes with a read-only clone and holds the vault. The scheduler executes on a timer with a
 read-only deploy key, the vault delivered out of band, and SSH pinned by source address.
 
-**Home** — automation, cameras and IoT on their own VLANs, documented as a design rather than as a
+**Home** - automation, cameras and IoT on their own VLANs, documented as a design rather than as a
 floor plan. See [the scoping note](docs/home/README.md) for what is deliberately absent, and for why
 the word *isolated* is being checked against an export before it gets used here.
 

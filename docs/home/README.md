@@ -5,7 +5,7 @@ client devices are part of the same design, and most of the segmentation decisio
 these docs exist because of them.
 
 > **Status, 11 Sep 2026.** This page is a scope, not yet a write-up. An export of the live firewall
-> policy did not match my own notes about what these VLANs are permitted to do — and it diverged in
+> policy did not match my own notes about what these VLANs are permitted to do - and it diverged in
 > *both* directions: some boundaries turned out tighter in practice than the rules require, others
 > looser than the notes claimed. Nothing here asserts a boundary until it has been read off the
 > machine rather than off a document. That reconciliation is the next piece of work, and it is the
@@ -13,7 +13,7 @@ these docs exist because of them.
 
 ## What will be documented here
 
-- **What separating IoT and cameras is actually enforcing** — which direction is blocked, what the
+- **What separating IoT and cameras is actually enforcing** - which direction is blocked, what the
   exceptions are, and how each one was verified rather than assumed. Separate VLAN and *isolated*
   are two different claims, and only the first one is free.
 - **The gap between what a rule permits and what the devices do.** These are different measurements
