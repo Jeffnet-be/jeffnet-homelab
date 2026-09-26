@@ -26,7 +26,7 @@ notification service, network-device config backup.
 **Documentation and data** - a documentation wiki, a source of truth for infrastructure records, a
 document management system, file sync and share, media.
 
-**Home** - the automation platform, bridging to the isolated IoT and camera VLANs.
+**Home** - the automation platform, bridging to the IoT and camera VLANs.
 
 Deliberately absent: a mail relay, which means account mail from one application does not work and
 that is recorded rather than discovered; and an in-repo secrets manager, because credentials live in

@@ -32,10 +32,17 @@ the things themselves.
 
 ## The environment in one page
 
-**Network** - six VLANs behind a firewall that is both gateway and the only inter-VLAN policy
-point, with a managed switch carrying tagged trunks. The segmentation write-up is being redone
-against an export of the live ruleset rather than against my notes; see
-[the findings index](docs/findings/) when it lands.
+**Network** - seven VLANs behind a firewall that is both gateway and the only inter-VLAN policy
+point, with a managed switch carrying tagged trunks. It was six until the interface table was read
+instead of the notes. The missing one was the *native* VLAN - the one nobody configures
+deliberately, and the one the wireless access points need in order to adopt at all.
+
+The segmentation write-up is not published. An earlier draft asserted a rule count that a later
+export of the live policy table disproved, and it was withdrawn rather than patched: a page written
+from notes about a firewall is a page about the notes. What the export actually showed has its own
+lesson, and it generalises beyond one device - **a granular rule sitting above a catch-all is a
+logging category, not a control.** Every careful rule below a permissive one classifies traffic that
+was already allowed.
 
 **Platform** - three Proxmox nodes in a cluster, every guest declared in Terraform, configuration by
 Ansible from a dedicated controller. Two plays run estate-wide on a schedule. Guests are containers
@@ -46,17 +53,33 @@ split-horizon wildcard DNS record. A service is declared once and *derived* into
 dashboard card, uptime check and metric targets. Adding one is an entry, never a block; deleting one
 removes all four by itself.
 
+**Inventory** - one source of truth for what runs where, populated from the repository rather than
+the other way round. It exists because "which host holds which address" was being answered by
+grepping an inventory file, and because the complaint that produced it was phrased as a DNS problem:
+*every name resolves to the reverse proxy*. That was the design working. **Losing track of what runs
+where is an inventory problem wearing a DNS costume** - and the useful move was to ask which question
+was actually going unanswered rather than to design an answer to the one that got asked.
+
 **Observability** - probes at three layers, network monitoring by SNMP, config backup by SSH, log
 aggregation, and host-based intrusion detection on every guest. Detectors publish to a single push
 service with one write-only identity each, and one phone subscription.
 
-**Credentials** - three roles, three scopes, no overlap. The workstation authors. The controller
+**Credentials** - four roles, four scopes, no overlap. The workstation authors. The controller
 executes with a read-only clone and holds the vault. The scheduler executes on a timer with a
-read-only deploy key, the vault delivered out of band, and SSH pinned by source address.
+read-only deploy key, the vault delivered out of band, and SSH pinned by source address. CI only
+plans, and holds nothing with an expiry date on it: workload identity federation to the cloud, and
+an OAuth client scoped to a single tag for the mesh VPN.
+
+That last one used to be a static VPN key with a date on it, which is a particular kind of pending
+outage. **An expired VPN key fails closed** - the route stays configured and unreachable, so the
+symptom is a job that quietly stops seeing half the world, on a date nobody has in a calendar. Ask of
+every credential that holds a network path open: when does it expire, do they expire together or one
+at a time, and **which of them could stop having an expiry date at all.**
 
 **Home** - automation, cameras and IoT on their own VLANs, documented as a design rather than as a
 floor plan. See [the scoping note](docs/home/README.md) for what is deliberately absent, and for why
-the word *isolated* is being checked against an export before it gets used here.
+the word *isolated* is being checked against the device itself - not against a report about it -
+before it gets used here.
 
 ---
 
@@ -80,9 +103,34 @@ alerts into a channel nobody was subscribed to on a device that interrupts. A de
 nothing, twice, from two different wrong paths, and reported success both times. A guard compared a
 list against an empty one produced by a pipeline whose last command could not fail. An enrolment
 port was closed on purpose, correctly, and nothing recorded that the estate had stopped being able
-to grow.
+to grow. A config backup ran on its timer for weeks and committed one file whose entire contents
+were the error message the device had returned instead of its configuration.
 
 Exactly one of those looks like an outage. The rest look like green.
+
+**And the inverse deserves the same attention.** Reading the private repository end to end - rather
+than the documentation describing it - produced twelve findings, and three of them said a document
+was wrong. Two of those said the estate was *better* than recorded: a control that had been running
+since August while four separate documents stated it did not exist, and a defect that had been fixed
+weeks before it stopped being carried on the work list.
+
+A document wrong in the safe direction is not harmless. Work gets queued that is already finished,
+and a control believed absent is a control nobody ever thinks to test.
+
+**A control can also fail by working.** The config backup above eventually started collecting, after
+a permission change made on the device that nothing in the repository could show - and from that
+moment every run committed the device's stored secrets, obfuscated but not stripped. The device
+re-obfuscates them on every read, so each collection produced a diff that changed nothing of
+substance and never stopped changing. That noise *was* the finding, and it had been written off as
+cosmetic for weeks on the reasonable-sounding grounds that a backup which churns is still a backup.
+Reading it took ten minutes. The fix was a configuration block that had been left empty - which is
+how a redaction feature ends up disabled without anyone having declined it.
+
+**Read the noise before you suppress it**, and hold the converse next to it, because it is the more
+useful half: stripping the secrets is correct, and it removes part of what a restore needs. A dated
+record of what changed, and an artefact you can rebuild the device from, are two different jobs that
+one control cannot hold at once.
+[The write-up](docs/findings/2026-09-26-the-backup-that-was-too-complete.md).
 
 Everything in [docs/principles](docs/principles/README.md) is there because one of them happened
 here, on real hardware, and was found by reading the machine instead of the documentation.

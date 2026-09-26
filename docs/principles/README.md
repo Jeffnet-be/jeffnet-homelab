@@ -16,12 +16,33 @@ storage can be defined, mounted, scheduled, green - and have never carried a byt
 **Verify a backup by restoring from it**, and know which storage the restore came from. Anything
 else is a claim about existence, not about recovery.
 
+**A backup you have made safe to store may no longer be safe to rely on.** Stripping secrets out of
+a configuration backup is correct, and it removes part of what a restore needs. *A dated record of
+what changed* and *an artefact you can restore from* are two jobs, and one control usually cannot
+hold both - so finishing the first one quietly ends the second unless the second is given its own
+artefact.
+
 **Verify a control's coverage, not just its existence.** A nightly backup job that protects under a
 third of the estate is not a smaller version of a working backup job. It looks identical from the
 dashboard.
 
 **Read the machine, not your notes.** A dozen times the notes have been wrong and the system right.
 A file's mtime has settled in one command what three rounds of inference could not.
+
+**A configuration read cannot settle an outcome question.** "Is this control working?" is answered by
+the artefact it produces, never by the file that produces it. A template that says an account has
+insufficient permission is evidence about the template; on anything configured by hand, what the
+account may do today is a separate fact, changed in a separate place, recorded nowhere. Three
+documents once stated a control had never worked, from a correct reading of a correct file, while it
+had been working for twelve days.
+
+**Read the noise before you suppress it.** A diff that changes constantly while changing nothing of
+substance is not untidiness, it is a description of what the artefact contains. The instinct to
+silence it is right; acting on it without reading it first removes the evidence and keeps the defect.
+
+**Count what you already have before inferring.** A repository's commit count divided by its
+collection interval dated an undocumented change to within a day. Artefacts carry their own
+timestamps, and arithmetic on them beats three rounds of reasoning about them.
 
 **Check that the test could have produced the signal** - including your own probe. Three zeroes from
 a `curl` that never connected are not three measurements.
@@ -31,6 +52,19 @@ says what *may* happen, never what does. Reading a rule and reporting behaviour 
 reading a container's exposed ports and calling them published - and a rule covering several
 services cannot have its counter attributed to one of them. The behaviour is in the session log, and
 nowhere else.
+
+**A granular rule sitting above a catch-all is a logging category, not a control.** Every careful rule
+below a permissive one classifies traffic that was already allowed. Read the table in evaluation
+order, find the widest thing in it, and judge everything above it against that - because an audit
+that walks the list rule by rule will find each individual one defensible and miss that none of them
+decide anything. Narrowing the catch-alls is the work; the granular rules only start being controls
+afterwards.
+
+**An export is a summary, and a summary can drop a qualifier.** A report of a policy table rendered a
+rule's destination as a plain list where the device held a *negated* one - which reads as the exact
+opposite of what is configured, in a document that otherwise looks authoritative. Confirm anything
+that looks nonsensical against the device's own output. A rule that makes no sense is usually a
+reporting artefact, and occasionally it is a real misconfiguration; the export cannot tell you which.
 
 ## On guards
 
@@ -46,7 +80,10 @@ return-code contract. Otherwise a command that errors produces an empty result, 
 passes every comparison it is subtracted from and fails every one it is subtracted into.
 
 **A default is only safe in the direction that fails loudly.** A `| default()` on a variable nothing
-ever defines is a guess, not a default - require it and let it fail.
+ever defines is a guess, not a default - require it and let it fail. The same applies to a feature
+disabled by *omission*: an empty block is valid, silent, and reads as intentional, so the behaviour it
+selects is whichever one the software defaults to. An explicit `false` is reviewable - somebody chose
+it, and a reviewer can ask why. An absent key looks like nothing at all.
 
 **A guard is only as reliable as the least-converged host in its group.** The host outside the
 nightly is where guard defects surface, months late.
@@ -88,7 +125,16 @@ deliberately not a notification path here; that sentence exists precisely so nob
 
 **A hardening step that closes a path must say what it will cost later.**
 
-**A stopgap needs a written end condition**, or it is a permanent decision taken by accident.
+**A stopgap needs a written end condition**, or it is a permanent decision taken by accident. And
+the end condition has to be executed when it arrives - one here was written correctly, arrived, and
+was still sitting in place three days later.
+
+**An incidental signal still has to be recorded as deliberate.** A control can emit proof of its own
+liveness as a side effect - a timestamp line that changes on every successful read, so a commit
+appears only when the collection worked. That makes silence the failure signal, which is worth
+alerting on, and it survives only if somebody writes down that the ugly line is load-bearing.
+Otherwise the next person tidies it away, correctly, by every standard except the one nobody
+recorded.
 
 **Record what a test cannot prove.** A scheduled check inherits its runner's reach; enumerate what
 it cannot see and write that beside the green.

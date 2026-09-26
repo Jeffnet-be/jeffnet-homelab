@@ -17,7 +17,14 @@ that doesn't exist. Each node has a role, and every workload is placed against a
 - **Observability** - the metrics stack, the network monitor, a second resolver, and the push
   service that every alert terminates on.
 - **Capacity** - the largest node, carrying the workloads that actually consume something, plus
-  shared storage for the other two and the primary remote-access route.
+  shared storage for the other two, and the mesh-VPN exit node that remote clients name.
+
+Two of the three advertise the same route into the server network, and it is worth being precise
+about what that does and does not buy, because the mesh VPN has no concept of a preferred router:
+overlapping advertisements are **equal candidates**, and failover between them takes seconds and
+needs nobody's attention. The **exit node** is the opposite - the client names one, so it does not
+fail over at all. Two mechanisms, one product, and only one of them is redundant. Calling either of
+them "primary" imports a model the software does not have.
 
 Three nodes is the smallest cluster that can hold quorum through the loss of one, which is the whole
 reason for the third.
@@ -90,17 +97,40 @@ otherwise a passing nightly is read as covering the estate.
 
 ---
 
-## Three roles, three credential scopes, no overlap
+## Four roles, four credential scopes, no overlap
 
 This is the part I would keep in any environment, at any size.
 
-| | Authors | Executes on demand | Executes on a schedule |
-|---|---|---|---|
-| **Who** | The workstation | The controller | The scheduler |
-| **Repository access** | Write, both remotes | Read-only clone | Read-only deploy key, one repository |
-| **Holds the vault?** | No | Yes, with the password | Delivered out of band, mounted read-only |
-| **Can push?** | Yes | No | No |
-| **SSH reach** | - | The estate | One inventory group, pinned by source address |
+| | Authors | Executes on demand | Executes on a schedule | Plans only |
+|---|---|---|---|---|
+| **Who** | The workstation | The controller | The scheduler | CI |
+| **Repository access** | Write, both remotes | Read-only clone | Read-only deploy key, one repository | Checkout per run |
+| **Holds the vault?** | No | Yes, with the password | Delivered out of band, mounted read-only | No |
+| **Can push?** | Yes | No | No | No |
+| **SSH reach** | - | The estate | One inventory group, pinned by source address | - |
+| **Credential lifetime** | Long-lived | Long-lived | Long-lived | **Nothing with an expiry date** |
+
+**The fourth column was the last one to be got right, and it is the one worth copying.** CI only ever
+plans, so it needs the least - and for a while it held the most awkward thing in the estate: a static
+mesh-VPN key with a date on it, three lines below a cloud login that was already federated. One job,
+two identity models, and the better one was already sitting above the worse one. **The inconsistency
+inside the single file was a stronger signal than either half read on its own.**
+
+It now federates to the cloud, and authenticates to the VPN as an OAuth client scoped to mint one
+kind of short-lived key for one tag. The node it creates removes itself when the run ends. Nothing in
+that column expires, so nothing in it is an outage with a date on it.
+
+Two details that cost time:
+
+- **A permission written in terms of who *people* are grants a machine identity nothing.** The tag
+  the client needed was owned by the administrators group - which looked correct, and had been
+  correct for months, because every caller until then had been a person. An OAuth client is not a
+  member of a user group; it authenticates *as the tags it was granted*, so the tag has to be owned
+  by a tag. The error said "invalid or not permitted" - two different faults in one string, and only
+  reading the policy file split them.
+- **Scope the minting narrowly.** The first attempt granted the client the ability to create OAuth
+  applications: a credential that can mint credentials is not a narrower version of the thing you
+  wanted. Caught before it was saved.
 
 **The machine that executes the code should not be able to rewrite it.** That used to be a
 convention, which meant it existed only while a person was doing the work. It is now a read-only
