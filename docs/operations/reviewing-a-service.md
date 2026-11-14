@@ -33,6 +33,11 @@ with a database inside a guest: a file-level copy of a live SQLite database is a
 being written to, and so is a guest backup of a running search index in a named volume. At the third
 instance it stops being a per-service finding and becomes an estate rule.
 
+The git service later changed what the question means for it: once the hosted repository became
+canonical and the on-prem server a read-only mirror, "restorable" stopped being a data question and
+became a rebuild question. Nothing on it is unique any more - the mirrors are recreated from their
+sources - so what has to survive is the configuration and the tokens, not a dump.
+
 **A review finds more in what a service leaves behind than in the service.** The ten-minute review
 above led, via its own orphaned agent registration, to four further findings over the following
 hours - including two defects in a guard that had been written the week before. Each was only
@@ -52,3 +57,6 @@ reachable through the one before it.
    Every new system arrives with its own permanent reds.
 7. Prove the path before you populate the system.
 8. After the play, wait a full monitoring interval and look at the board.
+9. Put it behind the guest firewall: its allow-list derives from the same declaration, so the work is
+   one entry and one flag. Then prove it from outside - the direct port times out, the name still
+   loads - and say in the change whether the guest reboots.

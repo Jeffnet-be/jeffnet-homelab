@@ -70,7 +70,8 @@ reporting artefact, and occasionally it is a real misconfiguration; the export c
 
 **A guard that cannot fail is not a guard.** Observed variants: a string the software never emits; a
 task that `--check` skips; a placeholder silently dropped; a `| default([])` that empties the list
-being compared *from*; a pipeline whose last command always succeeds.
+being compared *from*; a pipeline whose last command always succeeds; an error handler wrapped around
+a file read, which turns "the file is missing" into "the file is empty".
 
 **Prove a guard denies by breaking what it compares against** - and re-prove it after you change the
 guard. An old proof does not carry over a rewrite.
@@ -99,6 +100,11 @@ interrupts produced the same outcome as having no monitoring at all.
 
 **Noise and silence are not symmetric failures.** Clients report noise. Nobody reports silence.
 
+**Alert on the outcome, not on the job.** A mirror whose token has expired keeps running, exits
+cleanly and serves yesterday's code; only "is the copy behind its source?" catches it. The same goes
+for a nightly that succeeds: a check-mode run that *would change something* is drift, and deserves
+its own page next to the one for failure.
+
 **Never let a monitor's normal state include red.** One permanently wrong dot trains everybody to
 read past the board.
 
@@ -110,6 +116,15 @@ uptime check and the metric targets from it. Deleting the declaration should del
 **Deleting a guest leaves behind everything that *enrolled* it.** Derived consumers drop by
 themselves; enrolled ones persist and show as broken rather than absent - which reads as a fault
 rather than a deletion.
+
+**Generate the allow-list from the declaration, and apply the declaration's own filter.** A firewall
+rule written from memory drifts from the service it protects; one derived from the same entry that
+routes the service cannot. The generator must ask the same question the router asks - *is this
+service routed?* - or it will open ports for things that listen on nothing.
+
+**Roll out default-deny from a canary to the ingress.** One guest first, with checks from outside
+(the direct port times out, the name still loads); then waves; the thing everything depends on last,
+alone. Two of anything redundant never go in the same change.
 
 **A variable's name is not its value.** Read what it resolves to on the target. In a
 one-stack-per-host estate, a path named after a service is a category error.
@@ -180,6 +195,12 @@ it no longer is.
 one machine for months, invisible, because one machine always ran the code.
 
 **Move a workload while it is empty.**
+
+**A host that runs your jobs cannot be restarted under them.** The job dies, and the scheduler keeps
+showing it as running, because nothing is left to record the end.
+
+**A plan from a stale checkout is right about the wrong code.** "No changes" from a copy that never
+pulled the merge is a true statement about nothing that matters. Pull before you apply.
 
 **Name which copy you mean.** "I fixed it" is not a complete statement when three machines hold a
 copy and two remotes hold the truth.

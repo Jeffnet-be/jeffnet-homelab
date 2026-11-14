@@ -35,8 +35,11 @@ decision worth reading; a service-to-address inventory is a target list and is n
 Secret scanning runs at two boundaries, on the theory that a control you have only ever seen pass is
 not a control:
 
-1. **Authoring side** - `gitleaks` as a pre-commit hook on the workstation.
-2. **Receiving side** - GitHub secret scanning and push protection.
+1. **Authoring side** - `gitleaks` as a pre-commit hook on the authoring workstation, installed per
+   machine: it does not travel with a clone, so a new workstation starts without it.
+2. **Receiving side** - GitHub secret scanning and push protection, and a CI workflow that scans the
+   full history on every push and weekly. This is the boundary that does not depend on which machine
+   committed.
 
 Both were proven to deny before being trusted: a canary string shaped like a live credential was
 staged, the commit was blocked, and the canary removed. Proving a guard allows is not proving it
