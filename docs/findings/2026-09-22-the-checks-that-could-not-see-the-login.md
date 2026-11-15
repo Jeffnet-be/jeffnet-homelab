@@ -87,9 +87,10 @@ fix.
 - From another host, all three answer a redirect to the identity provider: the login is enforced.
 - The login probe, pointed at a service that has no login, reports the `200` and **fails**. That is
   the denial, observed.
-- The uptime check's denial is shown by the second host's answer - a redirect where it now demands
-  `200` - not yet by deliberately breaking the bypass and watching it go red. That test is still worth
-  running, and this line says so rather than claiming it.
+- The bypass was then broken on purpose: its rules turned into ordinary login rules by hand. The
+  monitoring host started getting the redirect, and all three uptime checks went red on their next
+  run. Restoring the configuration with the playbook turned them green again. That is the uptime
+  check's denial, observed.
 
 ## The general lesson
 
