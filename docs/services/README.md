@@ -34,13 +34,22 @@ Deliberately absent: a mail relay, which means account mail from one application
 that is recorded rather than discovered; and an in-repo secrets manager, because credentials live in
 a commercial password manager that already has a mobile client and a recovery story.
 
+### Why there is an inventory
+
+The source of truth for what runs where is populated from the repository, not the other way round.
+It exists because "which host holds which address" was being answered by grepping an inventory
+file, and because the complaint that produced it was phrased as a DNS problem: *every name resolves
+to the reverse proxy*. That was the design working. Losing track of what runs where is an inventory
+problem wearing a DNS costume, and the useful move was to ask which question was going unanswered
+rather than to answer the one that got asked.
+
 ---
 
 ## The contract
 
 ![One declaration, two sources, six consumers](../../diagrams/service-derivation.svg)
 
-A service is declared **once**, in the host's variables: an identifier, the DNS name it answers to,
+A service is declared once, in the host's variables: an identifier, the DNS name it answers to,
 a port, and an authentication mode. A `contract` role derives everything else - FQDN, upstream,
 slug, expected health status - and every renderer consumes that one list: the proxy route, the
 forward-auth policy, the dashboard card, the uptime check, and the metrics and probe targets.
@@ -59,7 +68,7 @@ things made that safe rather than merely convenient:
   a default-deny policy, into a guest whose services go dark. The comment above it promised the
   opposite. The handler now only covers an empty list.
 
-The same list also carries services that are **not** Ansible hosts - hypervisor UIs, the switch
+The same list also carries services that are not Ansible hosts - hypervisor UIs, the switch
 controller, the firewall - which state their own address instead of getting one from inventory.
 Keeping both in one list is what makes the uniqueness checks meaningful: a collision between a
 managed service and an unmanaged one is invisible from either list alone.
@@ -73,12 +82,12 @@ by hand - if the dashboard needs a card, the card comes from the declaration or 
 
 The payoff shows up on deletion. Retiring one service removed its proxy route, its dashboard card,
 its uptime check and its metric targets from a single deleted entry, with no other change anywhere.
-**Render, don't reconcile.**
+Render, don't reconcile.
 
 What *didn't* drop is the more useful half: the intrusion-detection agent registration, host-key
 entries, and the backup archives - which now outlive the guest they protected, with nothing deciding
-when they should stop. **Derived consumers drop by themselves; enrolled ones persist and show as
-broken rather than absent.**
+when they should stop. Derived consumers drop by themselves; enrolled ones persist and show as
+broken rather than absent.
 
 ---
 
@@ -87,7 +96,7 @@ broken rather than absent.**
 **One compose stack per host, and the stack directory is named for the host's role, not the
 service.** Two services that share a host share a stack and a directory. A path variable named after
 a service is therefore a category error, and reading one cost two deliveries that reported success
-while copying nothing. **Read what a variable resolves to on the target, not what its name implies.**
+while copying nothing. Read what a variable resolves to on the target, not what its name implies.
 
 **`.env` substitutes; `env_file:` injects.** The first expands `${VAR}` inside the compose file. Only
 the second puts variables into the container's environment. A stack once rendered thirty-nine
@@ -118,7 +127,7 @@ been written to in ten days; there were no attachments, no exports, no configura
 backup slot, an uptime check, an image to keep current, and a dashboard card describing it as
 something it was not.
 
-It was destroyed with `terraform destroy`, and **the code stayed in the repository** - the knowledge
+It was destroyed with `terraform destroy`, and the code stayed in the repository - the knowledge
 was worth keeping, the running instance was not.
 
 A second retirement went the other way on the code. A CI runner had nothing left to do once the git

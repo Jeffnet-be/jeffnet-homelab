@@ -194,7 +194,8 @@ it no longer is.
 **A fresh clone is a completeness test for the repository.** Five dependencies had lived on exactly
 one machine for months, invisible, because one machine always ran the code.
 
-**Move a workload while it is empty.**
+**Move a workload while it is empty.** Migrating a service between nodes is trivial the day it is
+deployed and a project three months later.
 
 **A host that runs your jobs cannot be restarted under them.** The job dies, and the scheduler keeps
 showing it as running, because nothing is left to record the end.

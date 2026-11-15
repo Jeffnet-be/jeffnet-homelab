@@ -24,6 +24,16 @@ these docs exist because of them.
 > second layer, not a substitute for the boundary claims below, which are still being read off the
 > device one at a time.
 
+## What is already settled
+
+Seven VLANs. There were six until the firewall's interface table was read instead of the notes: the
+missing one was the *native* VLAN, the one nobody configures deliberately and the one the wireless
+access points need in order to adopt at all.
+
+An earlier segmentation page asserted a rule count that a later export of the live policy disproved,
+and it was withdrawn rather than patched. A page written from notes about a firewall is a page about
+the notes.
+
 ## What will be documented here
 
 - **What separating IoT and cameras is actually enforcing** - which direction is blocked, what the

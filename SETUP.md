@@ -19,6 +19,9 @@ identifiers are not.
 | Storage account, resource group, state key names | generic placeholders |
 | Screenshots | regenerated against placeholder data, or omitted |
 
+Software is named, in the README's stack table, because the design cannot be read without it.
+Versions, network-device vendors and models are not: those are what an attacker would look up.
+
 The VLAN numbering and the RFC1918 ranges are real. They are not routable and they describe a design
 decision worth reading; a service-to-address inventory is a target list and is not published.
 
