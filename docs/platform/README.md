@@ -96,13 +96,16 @@ firewall rollout into a scheduling problem as much as a rules problem:
   resolvers in one change means every client loses DNS at once. The second one waited for its own
   change until the first had run a night behind its new rules.
 - **A host that runs your jobs cannot be restarted under them.** Rebooting the scheduler's guest
-  killed the run it was executing, and the scheduler showed that run as *running* - for nine hours -
-  because nothing was left to record that it had ended.
+  killed the run it was executing, and the scheduler showed that run as *running* until someone
+  looked, because nothing was left to record that it had ended.
 - **Name every reboot in the pull request**, so the person applying picks the moment.
+
+[The write-up](../findings/2026-11-14-the-reboot-the-plan-did-not-mention.md).
 
 And one that is about the operator, not the provider: **apply from a stale checkout and the plan
 says "No changes"**. It is right - about the code it was given. The merged change simply isn't there,
 and the next pull request's plan is where it shows up. Pull before every apply.
+[The write-up](../findings/2026-11-14-the-plan-that-said-no-changes.md).
 
 ---
 
