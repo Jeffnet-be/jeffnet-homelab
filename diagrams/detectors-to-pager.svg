@@ -30,7 +30,7 @@
     <text x="60" y="464" font-weight="600" fill="#1b2430">Scheduled plays</text>
     <text x="186" y="464" font-size="12" fill="#5a6675">nightly, check mode</text>
   </g>
-  <text x="40" y="504" font-size="12.5" fill="#5a6675">Each path proven end to end - most of them by a real fault.</text>
+  <text x="40" y="504" font-size="12.5" fill="#5a6675">Each path proven end to end - some by a real fault, the rest by a deliberate test.</text>
 
   <!-- delivery rules -->
   <rect x="384" y="118" width="214" height="278" rx="7" fill="#ffffff" stroke="#3b6ea5" stroke-width="1.8"/>

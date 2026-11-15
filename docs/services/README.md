@@ -1,6 +1,6 @@
 # The services
 
-Around twenty services, each in its own guest, each deployed the same way. The value is not in the
+Around twenty-five services on twenty-one guests, each deployed the same way. The value is not in the
 list - it's in the fact that adding one is a single declaration, and that removing one is the same
 declaration deleted.
 

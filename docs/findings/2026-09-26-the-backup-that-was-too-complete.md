@@ -1,8 +1,7 @@
 # The backup that was too complete
 
-**Found:** 26 September 2026
-**Class:** The control was producing too much
-**Subject:** Network-device configuration backup
+**Found:** 26 September 2026 · **Class:** the control was producing too much · **Subject:**
+network-device configuration backup.
 
 A config backup that had already failed in two different ways, and was on its third, which was the
 one that looked like success.

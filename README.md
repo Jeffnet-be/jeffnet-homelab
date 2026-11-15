@@ -77,7 +77,7 @@ the intrusion detector above a severity threshold. Scheduled plays report to an 
 service, which alerts on failure *and* on silence; the nightly runs in check mode, so a second
 heartbeat per job pages when it finds anything that would change - **drift**, not just failure.
 
-**Credentials** - four roles, four scopes, no overlap. The workstation authors and applies. The
+**Credentials** - five actors, five scopes, no overlap. The workstation authors and applies. The
 controller executes with a read-only clone and holds the vault. The scheduler executes on a timer
 with a read-only deploy key, the vault delivered out of band, and SSH pinned by source address. CI
 only plans, and **stores no credential at all**: workload identity federation to the cloud, where it
@@ -161,4 +161,4 @@ here, on real hardware, and was found by reading the machine instead of the docu
 
 ## Licence
 
-Documentation under CC BY 4.0. Code in `examples/` under the MIT Licence. See [LICENSE](LICENSE).
+Documentation under CC BY 4.0. Code in `examples/` under the MIT License. See [LICENSE](LICENSE).

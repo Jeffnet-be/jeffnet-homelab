@@ -123,7 +123,7 @@ otherwise a passing nightly is read as covering the estate.
 
 ---
 
-## Four roles, four credential scopes, no overlap
+## Five actors, five credential scopes, no overlap
 
 This is the part I would keep in any environment, at any size.
 
@@ -163,7 +163,7 @@ Two details from the OAuth-client stage that cost time, and still apply to any m
   applications: a credential that can mint credentials is not a narrower version of the thing you
   wanted. Caught before it was saved.
 
-**A fifth actor, with less than CI.** An AI coding assistant opens branches and pull requests from
+**The fifth actor, with less than CI.** An AI coding assistant opens branches and pull requests from
 a cloud session that holds no secrets and has no route to the lab. It cannot change the CI workflow
 (a repository rule refuses its pushes there), it never merges, and it posts every project's plan
 summary on the pull request - because a green check proves that planning *succeeded*, not what it
@@ -175,7 +175,10 @@ deploy key, enforced by the git server.
 
 Two supporting decisions:
 
-- **The vault is not in git**, Git's purpose is to replicate a file to every copy of the repository, and a secret's requirement is that it doesn't. Those are opposite properties, and no amount of care about which remotes exist changes which one git is for. The vault is delivered out of band and mounted read-only.
+- **The vault is not in git.** Git's purpose is to replicate a file to every copy of the repository,
+  and a secret's requirement is that it doesn't. Those are opposite properties, and no amount of
+  care about which remotes exist changes which one git is for. The vault is delivered out of band
+  and mounted read-only.
 - **A deploy key beat a personal access token** on a documentation question. With two-factor
   enabled, the vendor's docs do not settle whether a token bypasses the second factor for
   git-over-HTTP, nor whether a read scope is sufficient to deny a push - two ambiguities on exactly
