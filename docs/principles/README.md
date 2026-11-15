@@ -86,6 +86,14 @@ disabled by *omission*: an empty block is valid, silent, and reads as intentiona
 selects is whichever one the software defaults to. An explicit `false` is reviewable - somebody chose
 it, and a reviewer can ask why. An absent key looks like nothing at all.
 
+**A check behind a login checks the login.** Decide which side of it the check must see, and make the
+other side a failure: an uptime check that follows the redirect, or a login probe that also accepts
+`200`, is green whether the login is there or not.
+
+**The tool you test with is not the client you deploy.** An identity provider redirected `curl` and
+answered the exporter with `401`, because one sent an `Accept` header and the other did not. Ask the
+probe what it receives.
+
 **A guard is only as reliable as the least-converged host in its group.** The host outside the
 nightly is where guard defects surface, months late.
 
