@@ -20,6 +20,7 @@ and a less honest one, and the dead theories are usually where the interesting r
 | 2026-11-14 | [The reboot the plan did not mention](2026-11-14-the-reboot-the-plan-did-not-mention.md) | An in-place change with an unannounced side effect |
 | 2026-11-14 | [The plan that said No changes](2026-11-14-the-plan-that-said-no-changes.md) | A true report about the wrong input |
 | 2026-09-26 | [The backup that was too complete](2026-09-26-the-backup-that-was-too-complete.md) | The control was producing too much |
+| 2026-09-22 | [The checks that could not see the login](2026-09-22-the-checks-that-could-not-see-the-login.md) | The control was the defect, twice |
 | 2026-09-02 | [The guard that could not fail](2026-09-02-the-guard-that-could-not-fail.md) | The control was the defect |
 | 2026-09-02 | [The door that was closed on purpose](2026-09-02-the-enrolment-window.md) | Correct hardening, unwritten consequence |
 | 2026-08-24 | [The backup that never existed](2026-08-24-the-backup-that-never-existed.md) | Fully declared, and fully unheard |
