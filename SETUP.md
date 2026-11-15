@@ -30,13 +30,28 @@ decision worth reading; a service-to-address inventory is a target list and is n
 - **Secrets, obviously** - but also credential *names*, key-store entry names, and the contents of
   any dashboard screenshot, which is the one place nobody remembers to look.
 
+## What is still in the history, and why it stays
+
+The network page withdrawn in September (`docs/architecture/network.md`) is gone from the tree and
+still in the git history, including two closed pull requests' refs, which the host does not let an
+owner delete. It holds no addresses or identifiers, it predates the firewall clean-up and the guest
+firewall, and it was withdrawn because it was inaccurate. A history rewrite would not reach the
+pull-request refs or existing clones, and recreating the repository would trade its history for
+very little, so it was **accepted rather than rewritten** (November 2026).
+
+This is the rule from the top of this page, applied to itself: history is permanent, so the review
+that matters is the one before the commit.
+
 ## Guards on this repository
 
 Secret scanning runs at two boundaries, on the theory that a control you have only ever seen pass is
 not a control:
 
-1. **Authoring side** - `gitleaks` as a pre-commit hook on the workstation.
-2. **Receiving side** - GitHub secret scanning and push protection.
+1. **Authoring side** - `gitleaks` as a pre-commit hook on the authoring workstation, installed per
+   machine: it does not travel with a clone, so a new workstation starts without it.
+2. **Receiving side** - GitHub secret scanning and push protection, and a CI workflow that scans the
+   full history on every push and weekly. This is the boundary that does not depend on which machine
+   committed.
 
 Both were proven to deny before being trusted: a canary string shaped like a live credential was
 staged, the commit was blocked, and the canary removed. Proving a guard allows is not proving it

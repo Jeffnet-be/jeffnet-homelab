@@ -1,7 +1,7 @@
 # Findings
 
-One file per finding. Each is dated to when it was found, written in the past tense, and published
-once it is closed.
+One file per finding. Each is dated to when it was found (where the cause is older, the file gives
+both dates), written in the past tense, and published once it is closed.
 
 The format is deliberate:
 
@@ -19,5 +19,5 @@ and a less honest one, and the dead theories are usually where the interesting r
 |---|---|---|
 | 2026-09-26 | [The backup that was too complete](2026-09-26-the-backup-that-was-too-complete.md) | The control was producing too much |
 | 2026-09-02 | [The guard that could not fail](2026-09-02-the-guard-that-could-not-fail.md) | The control was the defect |
+| 2026-09-02 | [The door that was closed on purpose](2026-09-02-the-enrolment-window.md) | Correct hardening, unwritten consequence |
 | 2026-08-24 | [The backup that never existed](2026-08-24-the-backup-that-never-existed.md) | Fully declared, and fully unheard |
-| 2026-08-20 | [The door that was closed on purpose](2026-08-20-the-enrolment-window.md) | Correct hardening, unwritten consequence |

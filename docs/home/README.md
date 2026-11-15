@@ -4,7 +4,7 @@ The network does not stop at the server VLAN. Cameras, the automation platform, 
 client devices are part of the same design, and most of the segmentation decisions elsewhere in
 these docs exist because of them.
 
-> **Status, 26 Sep 2026.** This page is a scope, not yet a write-up. An export of the live firewall
+> **Status, November 2026** (first written 26 September). This page is a scope, not yet a write-up. An export of the live firewall
 > policy did not match my own notes about what these VLANs are permitted to do - and it diverged in
 > *both* directions: some boundaries turned out tighter in practice than the rules require, others
 > looser than the notes claimed. Nothing here asserts a boundary until it has been read off the
@@ -16,6 +16,13 @@ these docs exist because of them.
 > for a reason worth stating: the export is a *summary*, and a summary of a policy table can drop a
 > qualifier and render a rule as its opposite. One did. Until each boundary has been confirmed
 > against the device's own output rather than a report about it, this section stays short.
+>
+> What has changed since is on the server side of these boundaries, not the home side: every service
+> guest now drops unsolicited inbound traffic at the hypervisor, with an allow-list generated from
+> its service declaration (see [the platform page](../platform/README.md)). That narrows what a
+> device on another VLAN could reach even where the firewall between them permits it - but it is a
+> second layer, not a substitute for the boundary claims below, which are still being read off the
+> device one at a time.
 
 ## What will be documented here
 

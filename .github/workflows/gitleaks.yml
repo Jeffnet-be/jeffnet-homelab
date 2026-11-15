@@ -18,6 +18,8 @@ on:
     - cron: '0 6 * * 1'
   workflow_dispatch:
 
+# Actions are pinned to a full commit SHA, the tag in a comment: a tag can be
+# moved, a commit cannot. A bump is a deliberate change of both.
 permissions:
   contents: read
 
@@ -25,11 +27,11 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0        # full history; the default shallow clone scans one commit
 
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # GITLEAKS_LICENSE is only required for organisation-owned repos.

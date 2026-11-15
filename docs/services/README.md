@@ -1,6 +1,6 @@
 # The services
 
-Around twenty services, each in its own guest, each deployed the same way. The value is not in the
+Around twenty-five services on twenty-one guests, each deployed the same way. The value is not in the
 list - it's in the fact that adding one is a single declaration, and that removing one is the same
 declaration deleted.
 
@@ -16,10 +16,12 @@ on convenience.
 
 **Ingress and identity** - reverse proxy, identity provider, two DNS resolvers.
 
-**Automation** - git, an automation controller, a scheduler running plays on a timer, a CI runner.
+**Automation** - a read-only git mirror, an automation controller, and a scheduler running plays on
+a timer.
 
-**Observability** - metrics and alerting, uptime checks, a network monitor, a log viewer, a push
-notification service, network-device config backup.
+**Observability** - metrics and alerting, uptime checks, a network monitor, a log viewer, and
+network-device config backup. Alerts leave the estate for one chat; scheduled runs report to an
+external heartbeat service.
 
 **Security** - host-based intrusion detection across every guest.
 
@@ -36,12 +38,26 @@ a commercial password manager that already has a mobile client and a recovery st
 
 ## The contract
 
-![One contract, two sources, five consumers](../../diagrams/service-derivation.svg)
+![One declaration, two sources, six consumers](../../diagrams/service-derivation.svg)
 
 A service is declared **once**, in the host's variables: an identifier, the DNS name it answers to,
 a port, and an authentication mode. A `contract` role derives everything else - FQDN, upstream,
 slug, expected health status - and every renderer consumes that one list: the proxy route, the
 forward-auth policy, the dashboard card, the uptime check, and the metrics and probe targets.
+
+**The hypervisor firewall reads the same declarations**, from a different tool: the Terraform project
+that writes each guest's firewall decodes the host's variables file directly, so a service's port is
+opened to the reverse proxy because the service is declared, not because someone remembered. Two
+things made that safe rather than merely convenient:
+
+- **It applies the contract's own filter.** Only a service with a DNS name is routed, so only a
+  service with a DNS name gets a port. The first version opened a port for every entry, including an
+  outbound-only worker that listens on nothing - harmless, and exactly the kind of rule that every
+  later reviewer has to understand before dismissing.
+- **A missing variables file fails the plan.** The first version wrapped the file read in an error
+  handler, which turned "this guest has no declaration" into "this guest has no services" - and, under
+  a default-deny policy, into a guest whose services go dark. The comment above it promised the
+  opposite. The handler now only covers an empty list.
 
 The same list also carries services that are **not** Ansible hosts - hypervisor UIs, the switch
 controller, the firewall - which state their own address instead of getting one from inventory.
@@ -104,6 +120,12 @@ something it was not.
 
 It was destroyed with `terraform destroy`, and **the code stayed in the repository** - the knowledge
 was worth keeping, the running instance was not.
+
+A second retirement went the other way on the code. A CI runner had nothing left to do once the git
+server became a read-only mirror, and its play had been commented out for weeks: **a commented-out
+block is a decision nobody finished**. It was removed everywhere - the guest, its firewall rules, its
+inventory entry, its templates, its image pin and its token pointer - and its guest ID was blocked,
+because its backup archives outlive it.
 
 > **A proof of concept that was never retired is indistinguishable from production to every system
 > that watches it.** It consumes backup capacity, a monitoring slot, upgrade attention and a line on

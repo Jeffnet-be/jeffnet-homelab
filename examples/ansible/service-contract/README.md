@@ -112,6 +112,6 @@ is the only part that should print once.
 ## A closing check
 
 The final task prints the count by source and every slug. That exists so a run **states its own
-coverage**: twenty-three services, nineteen inventory, four external. If that number drops, the diff
+coverage**: twenty-four services, twenty-one inventory, three external, at the time of writing. If that number drops, the diff
 says so before anything renders - and a control that silently narrows its own scope is the failure
 this whole repository is about.

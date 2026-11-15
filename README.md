@@ -50,8 +50,18 @@ except where the workload forbids it.
 
 **Ingress** - one reverse proxy, one site block, one wildcard certificate over DNS-01, one
 split-horizon wildcard DNS record. A service is declared once and *derived* into its proxy route,
-dashboard card, uptime check and metric targets. Adding one is an entry, never a block; deleting one
-removes all four by itself.
+dashboard card, uptime check, metric targets - and its firewall rules. Adding one is an entry, never
+a block; deleting one removes all of them by itself.
+
+**Guest firewall** - every service guest drops unsolicited inbound traffic at the hypervisor, and its
+allow-list is **generated from the same declaration**: the reverse proxy may reach each routed
+service's port, the uptime checker the ones that sit behind forward-auth, admin hosts may SSH and the
+metrics host may scrape. Everything else is an explicit, commented exception - and only two services
+are open to every client: DNS and the ingress itself. It rolled out from a single canary to the
+ingress, one wave at a time, and the two resolvers never rebooted in the same change. The firewall is
+its own Terraform project with its own token and role, kept off CI. That role is narrower than an
+administrator and wider than its name: the hypervisor will not write cluster-level firewall rules
+without a system-wide *modify* privilege, which is written down rather than pretended away.
 
 **Inventory** - one source of truth for what runs where, populated from the repository rather than
 the other way round. It exists because "which host holds which address" was being answered by
@@ -61,20 +71,32 @@ where is an inventory problem wearing a DNS costume** - and the useful move was 
 was actually going unanswered rather than to design an answer to the one that got asked.
 
 **Observability** - probes at three layers, network monitoring by SNMP, config backup by SSH, log
-aggregation, and host-based intrusion detection on every guest. Detectors publish to a single push
-service with one write-only identity each, and one phone subscription.
+aggregation, and host-based intrusion detection on every guest. Every detector ends in **one chat,
+through one bot** - metrics alerts, uptime checks, hypervisor and network-device notifications, and
+the intrusion detector above a severity threshold. Scheduled plays report to an external heartbeat
+service, which alerts on failure *and* on silence; the nightly runs in check mode, so a second
+heartbeat per job pages when it finds anything that would change - **drift**, not just failure.
 
-**Credentials** - four roles, four scopes, no overlap. The workstation authors. The controller
-executes with a read-only clone and holds the vault. The scheduler executes on a timer with a
-read-only deploy key, the vault delivered out of band, and SSH pinned by source address. CI only
-plans, and holds nothing with an expiry date on it: workload identity federation to the cloud, and
-an OAuth client scoped to a single tag for the mesh VPN.
+**Credentials** - five actors, five scopes, no overlap. The workstation authors and applies. The
+controller executes with a read-only clone and holds the vault. The scheduler executes on a timer
+with a read-only deploy key, the vault delivered out of band, and SSH pinned by source address. CI
+only plans, and **stores no credential at all**: workload identity federation to the cloud, where it
+may read the state and change none of it, and to the mesh VPN, where it joins as a tagged, ephemeral
+node that the policy lets reach one port on one host - with policy tests that refuse a save if it
+could reach anything else. Its hypervisor token can read everything and create, start or delete
+nothing. An AI coding assistant opens pull requests from a session that has no secrets and no route
+to the lab; a person reads every plan, merges and applies.
 
-That last one used to be a static VPN key with a date on it, which is a particular kind of pending
+That VPN login used to be a static key with a date on it, which is a particular kind of pending
 outage. **An expired VPN key fails closed** - the route stays configured and unreachable, so the
 symptom is a job that quietly stops seeing half the world, on a date nobody has in a calendar. Ask of
 every credential that holds a network path open: when does it expire, do they expire together or one
 at a time, and **which of them could stop having an expiry date at all.**
+
+**Git** - the hosted repository is canonical. The on-prem git server is a read-only pull mirror of
+every repository I own, refreshed hourly and checked daily against the original, for the day the
+hosted one is unreachable. A mirror whose token has expired keeps serving yesterday's code without a
+word, so the alert is on *a mirror behind its source*, not on the sync job's exit code.
 
 **Home** - automation, cameras and IoT on their own VLANs, documented as a design rather than as a
 floor plan. See [the scoping note](docs/home/README.md) for what is deliberately absent, and for why
@@ -85,7 +107,7 @@ before it gets used here.
 
 ## How a service is declared
 
-![One declaration, four consumers](diagrams/service-derivation.svg)
+![One declaration, two sources, six consumers](diagrams/service-derivation.svg)
 
 ## How an alert reaches a person
 
@@ -139,4 +161,4 @@ here, on real hardware, and was found by reading the machine instead of the docu
 
 ## Licence
 
-Documentation under CC BY 4.0. Code in `examples/` under the MIT Licence. See [LICENSE](LICENSE).
+Documentation under CC BY 4.0. Code in `examples/` under the MIT License. See [LICENSE](LICENSE).
