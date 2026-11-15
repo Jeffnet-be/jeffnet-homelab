@@ -30,6 +30,18 @@ decision worth reading; a service-to-address inventory is a target list and is n
 - **Secrets, obviously** - but also credential *names*, key-store entry names, and the contents of
   any dashboard screenshot, which is the one place nobody remembers to look.
 
+## What is still in the history, and why it stays
+
+The network page withdrawn in September (`docs/architecture/network.md`) is gone from the tree and
+still in the git history, including two closed pull requests' refs, which the host does not let an
+owner delete. It holds no addresses or identifiers, it predates the firewall clean-up and the guest
+firewall, and it was withdrawn because it was inaccurate. A history rewrite would not reach the
+pull-request refs or existing clones, and recreating the repository would trade its history for
+very little, so it was **accepted rather than rewritten** (November 2026).
+
+This is the rule from the top of this page, applied to itself: history is permanent, so the review
+that matters is the one before the commit.
+
 ## Guards on this repository
 
 Secret scanning runs at two boundaries, on the theory that a control you have only ever seen pass is
