@@ -128,7 +128,8 @@ Named so the design can be read. Versions, addresses and network-device vendors 
 ## About
 
 Built, run and written up by [Jeffrey](https://github.com/Jeffnet-be), as hands-on practice for
-infrastructure as code and security operations. Corrections and questions are welcome as issues.
+infrastructure as code and security operations. The curated case study, and my other work, are at
+[jeffnet.be](https://jeffnet.be/homelab). Corrections and questions are welcome as issues.
 
 ## Licence
 
