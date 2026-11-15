@@ -20,11 +20,9 @@ It has produced more findings than the build did.
 
 ## What running it actually teaches
 
-**The first question can end the review.** One service failed it in ten minutes: its database had
-not been written to in ten days, its WAL was empty, it had no attachments and no configuration. It
-had been deployed once to learn the deployment and never adopted. It was destroyed rather than
-carried - and the code kept in the repository, because the knowledge was worth keeping and the
-running instance was not.
+**The first question can end the review.** One service failed it in ten minutes: deployed once to
+learn the deployment, never adopted, and destroyed rather than carried.
+[What that retirement looked like](../services/README.md#what-a-retirement-looks-like).
 
 **The second question is the one that fails.** The git service passed eight of nine and failed
 *restorable*. Its application-consistent dump is on a timer, its contents verified - and it has

@@ -8,7 +8,7 @@ may execute, and who may read what.
 
 ## The cluster
 
-Three nodes, deliberately **asymmetric**. They were acquired at different times and have different
+Three nodes, deliberately asymmetric. They were acquired at different times and have different
 core counts and memory, and pretending otherwise would mean placing workloads against an average
 that doesn't exist. Each node has a role, and every workload is placed against actual hardware:
 
@@ -21,8 +21,8 @@ that doesn't exist. Each node has a role, and every workload is placed against a
 
 Two of the three advertise the same route into the server network, and it is worth being precise
 about what that does and does not buy, because the mesh VPN has no concept of a preferred router:
-overlapping advertisements are **equal candidates**, and failover between them takes seconds and
-needs nobody's attention. The **exit node** is the opposite - the client names one, so it does not
+overlapping advertisements are equal candidates, and failover between them takes seconds and
+needs nobody's attention. The exit node is the opposite - the client names one, so it does not
 fail over at all. Two mechanisms, one product, and only one of them is redundant. Calling either of
 them "primary" imports a model the software does not have.
 
@@ -47,7 +47,7 @@ excellent data about its own failure and no way to deliver it.
 
 ## Terraform
 
-A **monorepo**, with a separate project folder per concern and **a separate state per project**.
+A monorepo, with a separate project folder per concern and a separate state per project.
 Splitting by concern rather than by environment keeps the blast radius of an apply small, and it
 means a mistake in one area cannot plan against the others.
 
@@ -55,9 +55,9 @@ The split matters for a reason that isn't obvious until it bites: **`terraform s
 state.** Ask "is everything under Terraform?" in a multi-state repo and you get an answer scoped to
 whichever directory you happened to be standing in.
 
-State lives in **remote object storage**, and CI authenticates to it with **OIDC** - a short-lived
+State lives in remote object storage, and CI authenticates to it with OIDC - a short-lived
 federated token per run rather than a stored credential. There is no cloud secret in the repository
-or in the CI configuration to leak or rotate. CI's identity may **read** every state and write none:
+or in the CI configuration to leak or rotate. CI's identity may read every state and write none:
 it plans without taking the state lock, because the lock is a lease on the object - which is a write.
 Applies, from the workstation, always take it.
 
@@ -82,9 +82,6 @@ that have caught me:
 And one that isn't a replacement but is worse: **backup archives are keyed by guest ID.** A freed ID
 reused by a new guest inherits the old one's archive series and prune policy, and a restore prompt
 will offer both. Take the next free number.
-
-**Move a workload while it is empty.** Migrating a service between nodes is trivial the day it is
-deployed and a project three months later.
 
 ### Things that reboot instead, which the plan does not say
 
@@ -143,13 +140,19 @@ two identity models, and the better one was already sitting above the worse one.
 inside the single file was a stronger signal than either half read on its own.**
 
 It went through two steps. First an OAuth client scoped to mint one kind of short-lived key for one
-tag - better, but still a stored secret. Now **workload identity federation for both**: the job's own
+tag - better, but still a stored secret. Now workload identity federation for both: the job's own
 signed identity token is exchanged for an ephemeral VPN node with a single tag, and the VPN policy
-lets that tag reach **one port on one host** - the hypervisor API, which proxies for the other nodes.
+lets that tag reach one port on one host - the hypervisor API, which proxies for the other nodes.
 The policy carries tests that refuse a save if the tag could reach anything more. The node removes
 itself when the run ends. Its hypervisor token can read the estate and create, start or delete
 nothing; its cloud identity can read state and change none. **That column holds no credential at
 all**, so there is nothing in it to leak, rotate or expire.
+
+Expiry was the real problem with the static key. An expired VPN key fails closed: the route stays
+configured and unreachable, so the symptom is a job that quietly stops seeing half the world, on a
+date nobody has in a calendar. Ask of every credential that holds a network path open when it
+expires, whether they expire together or one at a time, and which of them could stop having an
+expiry date at all.
 
 Two details from the OAuth-client stage that cost time, and still apply to any machine identity:
 
@@ -199,7 +202,7 @@ months because one machine had always run the code:
   container
 - a file living in a directory that had never been committed
 
-None of those were bugs in the code. They were **dependencies that existed on exactly one machine**,
+None of those were bugs in the code. They were dependencies that existed on exactly one machine,
 invisible for as long as only that machine ran anything. Running the repository from a clean clone
 on a different host found all five in an afternoon.
 
