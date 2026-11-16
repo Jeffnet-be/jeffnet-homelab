@@ -15,15 +15,16 @@ identifiers are not.
 | Real | Here |
 |---|---|
 | Internal wildcard domain | `*.lab.example.internal` |
-| Per-service hostnames and addresses | `svc-<role>`, no addresses |
+| Per-service hostnames | `svc-<role>` |
+| Addresses | none, except documentation addresses (`192.0.2.0/24`) where an example needs one |
 | Storage account, resource group, state key names | generic placeholders |
 | Screenshots | regenerated against placeholder data, or omitted |
 
 Software is named, in the README's stack table, because the design cannot be read without it.
 Versions, network-device vendors and models are not: those are what an attacker would look up.
 
-The VLAN numbering and the RFC1918 ranges are real. They are not routable and they describe a design
-decision worth reading; a service-to-address inventory is a target list and is not published.
+No VLAN numbers or address ranges are published in the current tree. A service-to-address inventory
+is a target list and is not published either.
 
 ## What is not here, and why
 
@@ -37,7 +38,8 @@ decision worth reading; a service-to-address inventory is a target list and is n
 
 The network page withdrawn in September (`docs/architecture/network.md`) is gone from the tree and
 still in the git history, including two closed pull requests' refs, which the host does not let an
-owner delete. It holds no addresses or identifiers, it predates the firewall clean-up and the guest
+owner delete. It holds no addresses or hostnames. It does contain the VLAN numbering in use at the time, a summary
+of the server-VLAN rules and one firewall configuration keyword. It predates the firewall clean-up and the guest
 firewall, and it was withdrawn because it was inaccurate. A history rewrite would not reach the
 pull-request refs or existing clones, and recreating the repository would trade its history for
 very little, so it was **accepted rather than rewritten** (November 2026).
