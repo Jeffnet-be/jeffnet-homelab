@@ -43,7 +43,7 @@ management interface: all real services behind the same proxy, none of them Ansi
 proxy_external_services:
   - name: hypervisor-a
     dns_name: node-a
-    host: 10.0.0.11        # stated, because there is no ansible_host to read
+    host: 192.0.2.11       # stated, because there is no ansible_host to read
     scheme: https
     port: 8006
     auth: forward
