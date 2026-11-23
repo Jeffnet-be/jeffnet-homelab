@@ -1,0 +1,3 @@
+# Canonical author identity for `git log`, `git shortlog` and `git blame`.
+# GitHub does not read this file; see the commit message.
+Jeffrey Clauwaert <jeffrey@jeffnet.be>
