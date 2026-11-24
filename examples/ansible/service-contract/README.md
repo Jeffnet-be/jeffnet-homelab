@@ -67,9 +67,19 @@ One derivation worth stealing:
 
 ```jinja
 'expect_status': item.expect_status | default(
-                   'any(200, 302)' if (item.auth | default('none')) == 'forward' else '200'
+                   'any(200, 302)' if (item.auth | default('none')) == 'forward'
+                                      and (item.probe | default('upstream')) == 'upstream'
+                   else '200'
                  )
 ```
+
+**The `probe` condition is the part that matters.** A check that goes straight to the service
+(`upstream`) may meet the service's own login redirect, so `302` is fine there. A check that goes
+through the reverse proxy must accept **only `200`, without following redirects**: there a `302` is
+the identity provider's redirect, which means the monitoring bypass is broken, and accepting it, or
+following it to the login page's `200`, is exactly the check that could not fail in
+[The checks that could not see the login](../../../docs/findings/2026-09-22-the-checks-that-could-not-see-the-login.md).
+An earlier version of this example had only the first half.
 
 A service behind forward auth answers an unauthenticated probe with a redirect, not a 200. Deriving
 the expected status *from the auth mode* means the uptime check is right by construction. Written by

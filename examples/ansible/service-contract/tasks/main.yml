@@ -74,6 +74,7 @@
            'expect_status':   item.expect_status | default(
                                 'any(200, 302)'
                                 if (item.auth | default('none')) == 'forward'
+                                   and (item.probe | default('upstream')) == 'upstream'
                                 else '200'
                               ),
            'tls_skip_verify': item.tls_skip_verify | default(false),
