@@ -67,6 +67,15 @@ one. A small extension now drops that single line, from that single command's ou
 everything else to the upstream model. The first fetch afterwards committed once, removing the line;
 the next fetch committed nothing.
 
+**9. The line had been kept on purpose.** A review the same day pointed out that a September finding
+had already met this clock line and decided to keep it: because it changed on every read, a commit
+proved that a collection had worked, and "no commit for an hour" was the liveness alert. That decision
+was written down, in a finding and in the principles, and was reversed anyway, because the fix was
+made from the code without the record being read. The decision itself stands, for the reason in step
+7, but liveness could not be left to chance: every collection is being made to report straight to an
+external heartbeat service, success or failure, so that the service alerts when it hears nothing. That
+is not closed until the alert has fired once on purpose.
+
 ## The cause
 
 The backup's SSH client had host-key checking switched off. I had put it off because the target sat
@@ -95,8 +104,10 @@ the known-good value has to come from somewhere the attacker you are defending a
 control. When no such source exists, narrow the question: here, not "is this the right key?" but "was
 the path to the key the one I think it was?"
 
-**And a record full of noise is not a record.** A backup that commits every hour regardless shows
-neither the change you want to see nor the silence that would tell you it stopped.
+**And a record full of noise is not a record**, but before removing the noise, find out whether
+anyone was listening to it. A backup that commits every hour regardless hides real changes; that same
+hourly commit was also its only proof of life, and the reason was written down in a place nobody
+checked before changing the code. **Read the record before you tidy.**
 
 ### The professional twin
 

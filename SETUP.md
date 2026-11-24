@@ -21,7 +21,10 @@ identifiers are not.
 | Screenshots | regenerated against placeholder data, or omitted |
 
 Software is named, in the README's stack table, because the design cannot be read without it.
-Versions, network-device vendors and models are not: those are what an attacker would look up.
+Versions and models are not: those are what an attacker would look up. Network-device vendors are not
+named either, but treat that as tidiness, not secrecy: configuration keywords in the history and
+behaviour described in the findings let a careful reader infer them. Nothing here depends on the vendor
+staying unknown.
 
 No VLAN numbers or address ranges are published in the current tree. A service-to-address inventory
 is a target list and is not published either.

@@ -96,7 +96,8 @@ plan. [More](docs/home/README.md).
 
 ## The stack
 
-Named so the design can be read. Versions, addresses and network-device vendors are not published.
+Named so the design can be read. Versions and addresses are not published, and network-device vendors
+are not named; a careful reader can still infer some from the details, so that is a courtesy, not a control.
 
 | Layer | Software |
 |---|---|

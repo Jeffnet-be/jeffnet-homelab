@@ -123,6 +123,16 @@ And the line it rests on looked exactly like noise. **An incidental signal still
 as deliberate**, or the next person tidies it away - correctly, by every standard except the one
 nobody wrote down.
 
+> **Superseded, 24 November 2026.** The clock line was removed after all, and the first time it was
+> written down did not stop it: the change was made from the code without this page being read.
+> The decision now stands for its own reasons. A firmware update renamed the line, every hourly read
+> committed, and a history in which every entry is a clock change hides the real ones. Liveness is
+> moving off the side effect: every collection reports to an external heartbeat service directly,
+> success or failure, and that service alerts on silence (deployed after this note; the item stays open
+> until that alert has fired once). Commits now mean only that the
+> configuration changed. See
+> [The backup that trusted whoever answered](2026-11-24-the-backup-that-trusted-whoever-answered.md).
+
 **A redacted configuration backup is not a restorable one.** Stripping the secrets is correct and it
 is not free: the artefact that is now safe to keep in version control can no longer rebuild the
 device, because the thing that was removed is part of what a restore needs. Those are two different

@@ -152,12 +152,14 @@ deliberately not a notification path here; that sentence exists precisely so nob
 the end condition has to be executed when it arrives - one here was written correctly, arrived, and
 was still sitting in place three days later.
 
-**An incidental signal still has to be recorded as deliberate.** A control can emit proof of its own
-liveness as a side effect - a timestamp line that changes on every successful read, so a commit
-appears only when the collection worked. That makes silence the failure signal, which is worth
-alerting on, and it survives only if somebody writes down that the ugly line is load-bearing.
-Otherwise the next person tidies it away, correctly, by every standard except the one nobody
-recorded.
+**An incidental signal still has to be recorded as deliberate, and a deliberate one is better.** A
+control can emit proof of its own liveness as a side effect - a timestamp line that changes on every
+successful read, so a commit appears only when the collection worked. That makes silence the failure
+signal, which is worth alerting on, and it survives only if somebody writes down that the ugly line is
+load-bearing. Here it was written down, and was tidied away two months later anyway, by someone
+changing the code without reading the record. Recording it is the minimum; **the better fix is a
+signal that exists only to be one**, such as a direct report to an external heartbeat on every run,
+so that tidying cannot remove it by accident.
 
 **Record what a test cannot prove.** A scheduled check inherits its runner's reach; enumerate what
 it cannot see and write that beside the green.

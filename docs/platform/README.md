@@ -67,6 +67,20 @@ every guest's rules from the same service declarations the reverse proxy uses (s
 [the services page](../services/README.md#the-contract)). A firewall that needs a privilege nothing
 else needs should not share a token with things that don't.
 
+**The hypervisors are behind the same firewall, not just their guests.** Each node's own rules allow
+cluster traffic between the nodes, management from the admin and monitoring sets, and a short list of
+named exceptions; nothing else.
+Each node went through the same three steps, one node and one step per change: **off**, then
+**audit** (the last rule accepts and logs, so the log shows exactly what enforcing would drop), then
+**enforce**, only once that log held nothing unexplained. One empty log was first proven to
+log at all, by sending it something it should catch. Rolling back is a one-line change on any node of
+the cluster, never stopping the firewall service, which would drop the guests' rules with it.
+
+**An apply runs only from the merged main branch.** The wrapper that applies refuses a dirty working
+tree, another branch, or a checkout that is behind or ahead of the remote, then plans to a file and
+applies exactly that file. The reason is
+[The plan that said No changes](../findings/2026-11-14-the-plan-that-said-no-changes.md).
+
 ### Things that force replacement, learned the hard way
 
 Read every plan: **`# forces replacement` first, then the resource key, then the counts.** The ones
