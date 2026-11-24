@@ -17,8 +17,8 @@ There was no outage and no alert. The lab's configuration backup logs into the e
 hour, reads the configuration and commits it to a git repository, so that any change on the firewall
 has a dated, diffable record.
 
-Its SSH client ran with host-key checking off. That had been noted in a September review and not
-fixed. It came back up because the lab had just finished doing the opposite
+Its SSH client ran with host-key checking off. I noted it in September and put it off: the firewall
+sat inside the lab, and that felt like enough. It came back up because the lab had just finished doing the opposite
 everywhere else: a week earlier, the automation's own host-key check had turned out to be off twice
 over, and had been fixed so that every server key is pinned in a tracked file. The backup tool was
 the one SSH client left that would talk to anything.
@@ -38,21 +38,19 @@ until that happened: the tracked key file shipped empty, and the pull request's 
 purpose until a person added a verified line.
 
 **3. The first attempt returned nothing.** Scanning the firewall's key from the automation controller
-came back empty: no key, no error. The firewall's own policy allows SSH to it from exactly one
-machine, the backup server, which is as it should be. So the scan was run from the backup server,
-the one place whose view of the key actually matters.
+came back empty: no key, no error. The firewall only accepts SSH from the few machines that need it,
+and the controller is not one of them. So the scan was run from the backup server, the one place
+whose view of the key matters.
 
 **4. The firewall could not confirm its own key.** The plan was to compare the fingerprint with the
 firewall's own console. The firewall's SSH client, pointed at itself, picked a different key type,
 accepted it silently, and showed no fingerprint at all. That was the second wrong turn: there was no
 second path to the key.
 
-**5. Confirming the path instead of the key.** The question was narrower than it looked. The backup
-server reaches the firewall through its default gateway, and that gateway *is* the firewall: it owns
-the address being scanned. To fake the key, something on the backup server's own segment would have to
-pose as that gateway at the moment of the scan. So the check became: does the hardware address the
-backup server holds for its gateway match the one the firewall's management interface shows for
-itself? It did. The key was pinned on that basis, and the commit message says how it was verified.
+**5. Confirming the path instead of the key.** The question was narrower than it looked. To fake the
+key, something on the backup server's own network would have to pose as its gateway at the moment of
+the scan. So the check became whether the gateway the backup server was talking to was the firewall's
+own interface. Its hardware address matched. The key was pinned on that basis, and the commit message says how it was verified.
 
 **6. The check held.** With the key pinned and checking on, the backup ran straight away and on demand,
 with no host-key errors in its log.
@@ -71,9 +69,8 @@ the next fetch committed nothing.
 
 ## The cause
 
-The backup's SSH client had host-key checking switched off, noted in September and not fixed. The
-target being inside the lab made that feel safe; inside the lab is exactly where a compromised machine
-would be.
+The backup's SSH client had host-key checking switched off. I had put it off because the target sat
+inside the lab, and inside the lab is exactly where a compromised machine would be.
 
 Separately, the backup's record of change was drowned by a clock line that the tool's model did not
 recognise on newer firmware, so the record could not show a real change, or the absence of one.
