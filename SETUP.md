@@ -47,6 +47,11 @@ firewall, and it was withdrawn because it was inaccurate. A history rewrite woul
 pull-request refs or existing clones, and recreating the repository would trade its history for
 very little, so it was **accepted rather than rewritten** (November 2026).
 
+One example address is also still in the history: early versions of the service-contract example
+in `examples/` used `10.0.0.11` for a hypervisor console. It was never a real address in this lab;
+it was replaced by a documentation address (`192.0.2.0/24`) so that no example looks like it might
+be one.
+
 This is the rule from the top of this page, applied to itself: history is permanent, so the review
 that matters is the one before the commit.
 

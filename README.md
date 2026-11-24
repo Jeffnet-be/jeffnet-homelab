@@ -13,6 +13,26 @@ findings are the point of this repository.
 
 ---
 
+## Each finding, in one line
+
+| Found | Finding | What it taught |
+|---|---|---|
+| 24 Nov 2026 | [The backup that trusted whoever answered](docs/findings/2026-11-24-the-backup-that-trusted-whoever-answered.md) | Switching a check on is the easy half; the hard half is the first thing it trusts. |
+| 17 Nov 2026 | [The check that was off twice](docs/findings/2026-11-17-the-check-that-was-off-twice.md) | A security setting is the value that wins, not the value you wrote. |
+| 16 Nov 2026 | [The reply that never left](docs/findings/2026-11-16-the-reply-that-never-left.md) | A shortcut that works can still be wrong in two ways at once. |
+| 14 Nov 2026 | [The reboot the plan did not mention](docs/findings/2026-11-14-the-reboot-the-plan-did-not-mention.md) | A plan describes state, not uptime. |
+| 14 Nov 2026 | [The plan that said No changes](docs/findings/2026-11-14-the-plan-that-said-no-changes.md) | A plan from a stale checkout is right about the wrong code. |
+| 26 Sep 2026 | [The backup that was too complete](docs/findings/2026-09-26-the-backup-that-was-too-complete.md) | A backup that is too complete is a secret store you did not know you were running. |
+| 22 Sep 2026 | [The checks that could not see the login](docs/findings/2026-09-22-the-checks-that-could-not-see-the-login.md) | An allow-list is not authentication, whatever it is called. |
+| 2 Sep 2026 | [The guard that could not fail](docs/findings/2026-09-02-the-guard-that-could-not-fail.md) | A control is untested until it has been seen refusing something. |
+| 2 Sep 2026 | [The door that was closed on purpose](docs/findings/2026-09-02-the-enrolment-window.md) | A hardening step that closes a path must say what it will cost later. |
+| 24 Aug 2026 | [The backup that never existed](docs/findings/2026-08-24-the-backup-that-never-existed.md) | "We have backups" is a claim about existence, not about coverage or recovery. |
+
+The rest of this page is the longer argument. The [findings index](docs/findings/README.md) has
+the full list and the format each one follows.
+
+---
+
 ## The thesis
 
 Here is what failure looked like in this lab:
@@ -118,11 +138,11 @@ are not named; a careful reader can still infer some from the details, so that i
 
 ## How a service is declared
 
-![One declaration, two sources, six consumers](diagrams/service-derivation.svg)
+![A service is declared once, in its host's inventory entry, and everything else is derived from it: the reverse-proxy route, the forward-auth policy, the dashboard card, the uptime check, the metric and probe targets and the guest firewall rules. Deleting the entry removes the derived pieces by itself; the intrusion-detection registration, host keys and backup archives are not derived and outlive it.](diagrams/service-derivation.svg)
 
 ## How an alert reaches a person
 
-![Many detectors, one pager](diagrams/detectors-to-pager.svg)
+![Six kinds of detector (metrics alerting, uptime checks, hypervisor notifications, network monitoring, intrusion detection and the nightly playbook runs) all end in one chat on one phone, hosted outside the estate. The uptime checker has its own dead-man heartbeat, scheduled jobs are watched for failure, silence and drift, and every path has been proven end to end.](diagrams/detectors-to-pager.svg)
 
 ---
 

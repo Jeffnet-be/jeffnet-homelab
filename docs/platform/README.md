@@ -17,14 +17,14 @@ that doesn't exist. Each node has a role, and every workload is placed against a
 - **Observability** - the metrics stack, the network monitor and a second resolver. Alerts leave the
   estate for a chat bot, so the pager does not share a failure domain with anything it reports on.
 - **Capacity** - the largest node, carrying the workloads that actually consume something, plus
-  shared storage for the other two, and the mesh-VPN exit node that remote clients name.
+  shared storage for the other two.
 
-Two of the three advertise the same route into the server network, and it is worth being precise
-about what that does and does not buy, because the mesh VPN has no concept of a preferred router:
-overlapping advertisements are equal candidates, and failover between them takes seconds and
-needs nobody's attention. The exit node is the opposite - the client names one, so it does not
-fail over at all. Two mechanisms, one product, and only one of them is redundant. Calling either of
-them "primary" imports a model the software does not have.
+**Remote access does not enter through the nodes.** Two small dedicated gateway VMs, on different
+nodes, advertise the server network to the mesh VPN; the hypervisors advertise nothing and are not
+exit nodes ([why](../findings/2026-11-16-the-reply-that-never-left.md)). The VPN uses one of the two
+as the primary route and switches to the other within seconds if the primary disappears, without
+anyone having to act. That is the redundancy: two gateways, one route, automatic failover. There is
+no exit node, because nothing needs one.
 
 Three nodes is the smallest cluster that can hold quorum through the loss of one, which is the whole
 reason for the third.
