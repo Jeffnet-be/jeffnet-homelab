@@ -18,6 +18,7 @@ and a less honest one, and the dead theories are usually where the interesting r
 | Date | Finding | Class |
 |---|---|---|
 | 2026-11-17 | [The check that was off twice](2026-11-17-the-check-that-was-off-twice.md) | A control that was off, and stayed off after it was switched on |
+| 2026-11-16 | [The reply that never left](2026-11-16-the-reply-that-never-left.md) | A shortcut two controls broke between them, and a trust it had been granting |
 | 2026-11-14 | [The reboot the plan did not mention](2026-11-14-the-reboot-the-plan-did-not-mention.md) | An in-place change with an unannounced side effect |
 | 2026-11-14 | [The plan that said No changes](2026-11-14-the-plan-that-said-no-changes.md) | A true report about the wrong input |
 | 2026-09-26 | [The backup that was too complete](2026-09-26-the-backup-that-was-too-complete.md) | The control was producing too much |
