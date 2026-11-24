@@ -67,6 +67,19 @@ every record says it is gone.
 Still open as an idea, not done: make the apply refuse to run unless the checkout is at `main`'s
 head. That would turn a written rule into one that does not depend on remembering it.
 
+**Update, 24 November: done.** Applies now go through a small wrapper script that fetches, then
+refuses unless the working tree is clean, the branch is `main` and it is exactly `main`'s head: not
+behind, and not ahead with unmerged commits either. Only then does it plan to a file, ask, and apply
+exactly that plan, with the state lock taken. Each refusal was tested on the workstation before it was
+trusted: an untracked file, another branch, a local unpushed commit, and a checkout one merge behind
+(the case of this finding). All four were refused with the reason, and a clean `main` planned normally.
+
+The first real run also found a bug in the guard itself. Its question was meant to name the commit
+being applied ("Apply this plan from `<commit>`?"), and printed nothing there. The shell in use treats
+`?` as part of a variable name, so the commit variable followed by a question mark was read as a
+different, empty variable. The one fact the question exists to show was the one missing. It was fixed
+the same evening. **A guard is code too, and is tested like code: by running it, not by reading it.**
+
 ## The general lesson
 
 **A plan from a stale checkout is right about the wrong code.** Any tool that reports a difference
