@@ -23,11 +23,14 @@ their own firewall.
 
 ## The chain
 
-**1. The obvious suspect was the new firewall.** Each server had just been given a default-deny
-firewall at the hypervisor, with an allow-list for SSH from admin hosts. A rule missing for the VPN
-would look exactly like this: a connection that times out instead of being refused. But servers on
-the other hypervisors, behind the same generated rule set, were fine. Whatever was wrong was specific
-to the one hypervisor, so the rules were not the place to keep looking.
+**1. The wrong suspects.** My first thought was a misconfiguration in the VPN itself: a route or an
+access rule that no longer covered that server. But the same VPN route reached the servers on the
+other two hypervisors without trouble. The other change of that week, the new firewall, failed the
+same test. Each server had just been given a default-deny firewall at the hypervisor, with an
+allow-list for SSH from admin hosts, and a rule missing for the VPN would look exactly like this: a
+connection that times out instead of being refused. But servers on the other hypervisors, behind the
+same generated rule set, were fine. Whatever was wrong was specific to the one hypervisor, so neither
+the VPN configuration nor the rules were the place to keep looking.
 
 **2. Watching the packets, not the rules.** A capture on that hypervisor showed the connection request
 arriving from the VPN, being translated to the hypervisor's own address (the VPN client masquerades
@@ -74,8 +77,9 @@ translation made every VPN device indistinguishable from a trusted hypervisor.
 - **A written rule:** never route the VPN on a hypervisor that hosts firewalled guests.
 
 Still a trade-off, and written down as one: the gateways translate addresses too, so every VPN device
-still arrives as a gateway address. The difference is that the gateways are single-purpose, and the
-VPN policy, not the lab's firewall, decides which devices may use them.
+still arrives as a gateway address. The difference is that those are now dedicated addresses, not the
+hypervisors' own: the gateways are single-purpose, and the VPN policy, not the lab's firewall, decides
+which devices may use them.
 
 ## The general lesson
 
