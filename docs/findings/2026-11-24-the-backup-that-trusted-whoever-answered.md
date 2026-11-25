@@ -72,9 +72,10 @@ had already met this clock line and decided to keep it: because it changed on ev
 proved that a collection had worked, and "no commit for an hour" was the liveness alert. That decision
 was written down, in a finding and in the principles, and was reversed anyway, because the fix was
 made from the code without the record being read. The decision itself stands, for the reason in step
-7, but liveness could not be left to chance: every collection is being made to report straight to an
-external heartbeat service, success or failure, so that the service alerts when it hears nothing. That
-is not closed until the alert has fired once on purpose.
+7, but liveness could not be left to chance: every collection now reports straight to an external
+heartbeat service, success or failure, and the service alerts when it hears nothing. It was proven the
+same evening by stopping the backup on purpose: once the expected interval and its grace period had
+passed, the alert reached the phone, and the first collection after the restart cleared it.
 
 ## The cause
 

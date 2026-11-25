@@ -126,10 +126,11 @@ nobody wrote down.
 > **Superseded, 24 November 2026.** The clock line was removed after all, and the first time it was
 > written down did not stop it: the change was made from the code without this page being read.
 > The decision now stands for its own reasons. A firmware update renamed the line, every hourly read
-> committed, and a history in which every entry is a clock change hides the real ones. Liveness is
-> moving off the side effect: every collection reports to an external heartbeat service directly,
-> success or failure, and that service alerts on silence (deployed after this note; the item stays open
-> until that alert has fired once). Commits now mean only that the
+> committed, and a history in which every entry is a clock change hides the real ones. Liveness no
+> longer rides on a side effect: every collection reports to an external heartbeat service directly,
+> success or failure, and that service alerts on silence. It was proven the same day by stopping the
+> collector on purpose: the alert arrived after the interval and its grace, and cleared on the first
+> collection after the restart. Commits now mean only that the
 > configuration changed. See
 > [The backup that trusted whoever answered](2026-11-24-the-backup-that-trusted-whoever-answered.md).
 
